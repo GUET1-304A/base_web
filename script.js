@@ -142,37 +142,68 @@ if (meteorShower) {
   }
 }
 
-const updateScrollMotion = () => {
-  const viewportHeight = window.innerHeight || 1;
+let cachedViewportHeight = 0;
+let cachedHeroData = null;
+let cachedSectionsData = [];
+
+const cacheDimensions = () => {
+  cachedViewportHeight = window.innerHeight || 1;
 
   if (heroSection) {
-    const heroRect = heroSection.getBoundingClientRect();
-    const heroRange = Math.max(heroRect.height * 0.72, 1);
-    const heroProgress = Math.min(Math.max(-heroRect.top / heroRange, 0), 1);
-    root.style.setProperty("--hero-progress", heroProgress.toFixed(4));
+    const rect = heroSection.getBoundingClientRect();
+    cachedHeroData = {
+      height: rect.height,
+      topAbsolute: rect.top + window.scrollY,
+    };
   }
 
-  revealSections.forEach((section) => {
+  cachedSectionsData = Array.from(revealSections).map((section) => {
     const rect = section.getBoundingClientRect();
-    const distanceFromCenter = rect.top + rect.height / 2 - viewportHeight / 2;
-    const progress = Math.min(Math.max(distanceFromCenter / viewportHeight, -1), 1);
-    section.style.setProperty("--section-progress", progress.toFixed(4));
+    return {
+      height: rect.height,
+      topAbsolute: rect.top + window.scrollY,
+    };
+  });
+};
+
+const updateScrollMotion = () => {
+  const scrollY = window.scrollY;
+
+  // --- 1. Calculations based on cache ---
+  let heroProgressVal = null;
+  if (cachedHeroData) {
+    const heroTop = cachedHeroData.topAbsolute - scrollY;
+    const heroRange = Math.max(cachedHeroData.height * 0.72, 1);
+    heroProgressVal = Math.min(Math.max(-heroTop / heroRange, 0), 1).toFixed(4);
+  }
+
+  const sectionsData = cachedSectionsData.map((data) => {
+    const sectionTop = data.topAbsolute - scrollY;
+    const distanceFromCenter = sectionTop + data.height / 2 - cachedViewportHeight / 2;
+    const progress = Math.min(Math.max(distanceFromCenter / cachedViewportHeight, -1), 1).toFixed(4);
+    const distance = Math.abs(distanceFromCenter);
+    return { progress, distance };
   });
 
+  // --- 2. State Calculation ---
   let activeSectionIndex = -1;
   let closestDistance = Number.POSITIVE_INFINITY;
 
-  revealSections.forEach((section, index) => {
-    const rect = section.getBoundingClientRect();
-    const distance = Math.abs(rect.top + rect.height / 2 - viewportHeight / 2);
-
-    if (distance < closestDistance) {
-      closestDistance = distance;
+  sectionsData.forEach((data, index) => {
+    if (data.distance < closestDistance) {
+      closestDistance = data.distance;
       activeSectionIndex = index;
     }
   });
 
+  // --- 3. DOM Writes ---
+  if (heroProgressVal !== null) {
+    root.style.setProperty("--hero-progress", heroProgressVal);
+  }
+
   revealSections.forEach((section, index) => {
+    const data = sectionsData[index];
+    section.style.setProperty("--section-progress", data.progress);
     section.classList.toggle("is-active-section", index === activeSectionIndex);
     section.classList.toggle("is-dimmed", activeSectionIndex > -1 && index < activeSectionIndex);
   });
@@ -479,10 +510,14 @@ const initGsapMotion = () => {
 
   initNavScrollSpy();
 
-  ScrollTrigger.addEventListener("refresh", updateScrollMotion);
+  ScrollTrigger.addEventListener("refresh", () => {
+    cacheDimensions();
+    updateScrollMotion();
+  });
   ScrollTrigger.refresh();
 };
 
+cacheDimensions();
 updateScrollMotion();
 applyProductSlideState(0);
 
@@ -492,8 +527,14 @@ if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
   initFallbackReveal();
 }
 
+window.addEventListener("load", () => {
+  cacheDimensions();
+  requestMotionUpdate();
+});
+
 window.addEventListener("scroll", requestMotionUpdate, { passive: true });
 window.addEventListener("resize", () => {
+  cacheDimensions();
   requestMotionUpdate();
   if (typeof ScrollTrigger !== "undefined") {
     ScrollTrigger.refresh();

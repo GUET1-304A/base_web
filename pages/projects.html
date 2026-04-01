@@ -1,0 +1,342 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary-dim": "#6e9df4",
+            "on-secondary-fixed": "#004656",
+            "on-error": "#490006",
+            "on-primary-fixed-variant": "#00438f",
+            "on-primary-container": "#00285b",
+            "secondary": "#82d1ec",
+            "primary": "#91b6ff",
+            "tertiary-container": "#c4acff",
+            "error-container": "#8a1a1e",
+            "inverse-on-surface": "#4c5566",
+            "inverse-primary": "#275daf",
+            "tertiary-dim": "#ab8afd",
+            "secondary-fixed-dim": "#91e0fa",
+            "on-background": "#d9e6ff",
+            "on-tertiary-container": "#41198d",
+            "surface-container": "#0b1a2e",
+            "primary-fixed": "#a3c1ff",
+            "tertiary-fixed-dim": "#b89bff",
+            "surface-dim": "#050e1c",
+            "secondary-fixed": "#b4ebff",
+            "on-tertiary-fixed-variant": "#4a2696",
+            "outline-variant": "#354965",
+            "secondary-dim": "#74c4de",
+            "background": "#050e1c",
+            "on-secondary-container": "#5eaec8",
+            "surface-variant": "#112641",
+            "primary-fixed-dim": "#8cb3ff",
+            "tertiary-fixed": "#c4acff",
+            "surface": "#050e1c",
+            "on-tertiary-fixed": "#290068",
+            "on-primary": "#00336f",
+            "error": "#ff716c",
+            "on-primary-fixed": "#002657",
+            "surface-container-high": "#0e2037",
+            "surface-container-lowest": "#000000",
+            "on-tertiary": "#4b2797",
+            "surface-tint": "#91b6ff",
+            "on-error-container": "#ff9993",
+            "on-surface-variant": "#98accd",
+            "on-surface": "#d9e6ff",
+            "surface-container-low": "#071425",
+            "on-secondary": "#004757",
+            "inverse-surface": "#f9f9ff",
+            "error-dim": "#c94947",
+            "primary-container": "#79a8ff",
+            "tertiary": "#d0bcff",
+            "surface-bright": "#152d4b",
+            "outline": "#637695",
+            "on-secondary-fixed-variant": "#00647a",
+            "secondary-container": "#002a35",
+            "surface-container-highest": "#112641"
+          },
+          fontFamily: {
+            "headline": ["Inter"],
+            "body": ["Inter"],
+            "label": ["Inter"]
+          },
+          borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #050e1c;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .celestial-glow {
+      box-shadow: 0 0 40px rgba(145, 182, 255, 0.1);
+    }
+    .glass-card {
+      background: rgba(11, 26, 46, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(158, 191, 255, 0.15);
+    }
+    .star-field {
+      background-image: 
+        radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 50px 160px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 90px 40px, #fff, rgba(0,0,0,0));
+      background-repeat: repeat;
+      background-size: 200px 200px;
+      opacity: 0.2;
+    }
+    .perspective-container {
+      perspective: 1000px;
+    }
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+    .flip-card:hover .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+    .flip-card-back {
+      transform: rotateY(180deg);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface">
+  <a href="../index.html" class="fixed top-6 left-6 z-[100] flex items-center pointer-events-auto gap-2 text-white/80 hover:text-white transition-colors bg-white/10 backdrop-blur px-4 py-2 rounded-full text-sm font-medium border border-white/10">
+    <span class="material-symbols-outlined text-sm">arrow_back</span> 返回首页
+  </a>
+
+<!-- Unified Top Navigation -->
+
+<header class="fixed top-6 left-0 right-0 z-40 pointer-events-none flex items-center justify-between max-w-7xl mx-auto px-6">
+  <nav class="pointer-events-auto bg-[#0c182a]/78 backdrop-blur-xl sticky top-6 mx-auto w-fit rounded-full px-8 py-3 border border-[#9ebfff]/15 shadow-[0_20px_60px_rgba(145,182,255,0.1)] flex items-center gap-8">
+    <a class="text-2xl font-extrabold tracking-tighter text-[#91b6ff] mr-8 flex items-center gap-2" href="../index.html">
+      <span class="grid place-items-center w-8 h-8 rounded-full bg-gradient-to-br from-[#79a8ff] to-[#ad8cff] text-[#04101f] text-sm">XY</span>
+      星雨作坊
+    </a>
+    <div class="hidden md:flex items-center gap-6">
+      <a class="text-[#98accd] hover:text-[#d9e6ff] transition-colors text-sm font-semibold" href="../index.html#about">社团简介</a>
+      <a class="text-[#98accd] hover:text-[#d9e6ff] transition-colors text-sm font-semibold" href="../index.html#members">人员介绍</a>
+      <a class="text-[#98accd] hover:text-[#d9e6ff] transition-colors text-sm font-semibold" href="../index.html#products">产品展示</a>
+      <a class="text-[#98accd] hover:text-[#d9e6ff] transition-colors text-sm font-semibold" href="../index.html#open-source">开源精神</a>
+    </div>
+    <a href="join.html" class="ml-8 bg-gradient-to-br from-[#79a8ff] to-[#95e4ff] text-[#03111f] shadow-[0_16px_40px_rgba(121,168,255,0.25)] px-6 py-2 rounded-full text-sm font-bold hover:-translate-y-0.5 transition-transform duration-200">加入我们</a>
+  </nav>
+</header>
+
+
+<!-- Celestial Background Decor -->
+<div class="fixed inset-0 pointer-events-none z-0">
+<div class="star-field absolute inset-0"></div>
+<div class="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-primary/10 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-tertiary/5 rounded-full blur-[150px]"></div>
+</div>
+
+<main class="relative z-10 pt-32 pb-24 px-6 md:px-12 max-w-screen-2xl mx-auto">
+<!-- Hero Editorial Section -->
+<header class="mb-20 text-center md:text-left">
+<div class="inline-block mb-4 px-4 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-bold tracking-[0.2em] uppercase">
+        策展阶段 04
+      </div>
+<h1 class="text-6xl md:text-8xl font-extrabold tracking-tighter text-on-surface mb-6 leading-none">
+        产品<span class="text-primary italic">画廊</span>
+</h1>
+<p class="max-w-2xl text-on-surface-variant text-lg leading-relaxed md:pl-2">
+        一系列在星际工作室的真空中精心打造的数字艺术品、网络架构和品牌形象。每一件作品都是对光与虚空的探索。
+      </p>
+</header>
+<!-- Interactive Filters -->
+<div class="flex flex-wrap items-center gap-4 mb-16">
+<button class="px-8 py-3 rounded-full bg-primary text-on-primary font-bold text-xs uppercase tracking-widest celestial-glow transition-all">全部作品</button>
+<button class="px-8 py-3 rounded-full glass-card text-on-surface-variant hover:text-primary font-bold text-xs uppercase tracking-widest transition-all">网页</button>
+<button class="px-8 py-3 rounded-full glass-card text-on-surface-variant hover:text-primary font-bold text-xs uppercase tracking-widest transition-all">工具</button>
+<button class="px-8 py-3 rounded-full glass-card text-on-surface-variant hover:text-primary font-bold text-xs uppercase tracking-widest transition-all">品牌</button>
+</div>
+<!-- Projects Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Project Card 1: Web -->
+<div class="perspective-container h-[450px] flip-card group">
+<div class="flip-card-inner">
+<!-- Front -->
+<div class="flip-card-front glass-card rounded-lg overflow-hidden group-hover:border-primary/50 transition-all duration-500">
+<div class="h-2/3 overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="high-end minimalist website interface with abstract fluid 3d shapes and neon accents in deep space background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbhe6_36Or2Q1XJm75kKClCEqxcej45XsYXCp1-bCOomEFgdD9JlYCF_F5idxrJp_r182WgPpvOYXNjgkBUO__WnzQA3OZzgn754Voap4dNLXy6k7bMrQdfVfoHwui-T8cmw75BSxgYZyPe_jHUObt3wSraidWRFG4zPiOco46E49YN5W5DzZXB2A0FtKBPdJEb3DmC43smWmuqx5zu_8jb39NhLlnHB7nkSRREYcwSI8OTXlXVitCgXOrpL5kQLevS__Y1vLhVg"/>
+</div>
+<div class="p-8">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-2xl font-bold tracking-tight">星云系统</h3>
+<span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 bg-secondary/20 text-secondary rounded">网页</span>
+</div>
+<p class="text-on-surface-variant text-sm line-clamp-2">专为分布式计算网络打造的下一代操作系统界面。</p>
+</div>
+</div>
+<!-- Back -->
+<div class="flip-card-back glass-card rounded-lg p-10 flex flex-col justify-center items-center text-center border-2 border-primary/40 shadow-[0_0_50px_rgba(145,182,255,0.2)]">
+<span class="material-symbols-outlined text-5xl text-primary mb-6" data-icon="language">language</span>
+<h3 class="text-xl font-bold mb-4">数字前沿</h3>
+<p class="text-on-surface-variant text-sm mb-8 leading-relaxed">通过 WebGL 和深度交互模型突破基于浏览器的体验边界。</p>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs">查看项目</button>
+</div>
+</div>
+</div>
+<!-- Project Card 2: Brand -->
+<div class="perspective-container h-[450px] flip-card group md:translate-y-12">
+<div class="flip-card-inner">
+<div class="flip-card-front glass-card rounded-lg overflow-hidden group-hover:border-tertiary/50 transition-all duration-500">
+<div class="h-2/3 overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="elegant brand identity system with silver foil embossing on dark textured paper in cinematic studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVDrNw930qVhd7_3N2Twj5ZgZWEQ_IrEDiyZXhqfWcnDPbGDfmRRmjsHj4JmNPdICdHXsX6rane6rvApVPZKz5Ew3_LsN97kp-WTuSbDvv5jcmGTdbC-LO9PTxAie6JIUd_mET1Mlx574cLTXEwBXGEqTsppcsmKehWV2YbIlc_IObk6oXlfwM3qPJD5__BgvFnQctb5vyrpb1G4f1n7m5IZlvrQNIZ3vdeVKMf5xufUpFsTNvzSp09Wxj-bZCWphhDxX7pHj8pg"/>
+</div>
+<div class="p-8">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-2xl font-bold tracking-tight">虚空机构</h3>
+<span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 bg-tertiary/20 text-tertiary rounded">品牌</span>
+</div>
+<p class="text-on-surface-variant text-sm line-clamp-2">为位于硅太网的一家精品创意咨询公司设计的视觉形象。</p>
+</div>
+</div>
+<div class="flip-card-back glass-card rounded-lg p-10 flex flex-col justify-center items-center text-center border-2 border-tertiary/40 shadow-[0_0_50px_rgba(208,188,255,0.2)]">
+<span class="material-symbols-outlined text-5xl text-tertiary mb-6" data-icon="auto_awesome">auto_awesome</span>
+<h3 class="text-xl font-bold mb-4">身份塑造</h3>
+<p class="text-on-surface-variant text-sm mb-8 leading-relaxed">一种失重状态下的标志设计和排版系统方法。</p>
+<button class="bg-tertiary text-on-tertiary px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs">案例研究</button>
+</div>
+</div>
+</div>
+<!-- Project Card 3: Tools -->
+<div class="perspective-container h-[450px] flip-card group">
+<div class="flip-card-inner">
+<div class="flip-card-front glass-card rounded-lg overflow-hidden group-hover:border-secondary/50 transition-all duration-500">
+<div class="h-2/3 overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="sleek professional software dashboard with dark theme and vibrant cyan data visualizations and charts" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqLGdUufP0hHoYoy48DvcQ2XQc1iJzCkyhZr6cG0TR48a9se1OJ_c_jt4Caq2_a81nlq-kB_zFLOSm_t2X0f0PuyntVFtjjdyYwX9Qe2B7YVLW4YV6vZ7xUOjdMCCZVE_nXtSBt5DzOy9-vsGS8PJn2wPuXYNyKVGG5kplib959Vwm4bqjo9AY2siTPGMdmSusovbJWiAa_BMHvLBpbzQ_5MUj8AdXgSpXK2d6HAOXN8frXmzS8LEh0Ai8jJfnOtn0_sPf_nTx2A"/>
+</div>
+<div class="p-8">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-2xl font-bold tracking-tight">Flux 编辑器</h3>
+<span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 bg-secondary/20 text-secondary rounded">工具</span>
+</div>
+<p class="text-on-surface-variant text-sm line-clamp-2">为新一代工程师打造的云原生协作代码编辑器。</p>
+</div>
+</div>
+<div class="flip-card-back glass-card rounded-lg p-10 flex flex-col justify-center items-center text-center border-2 border-secondary/40 shadow-[0_0_50px_rgba(130,209,236,0.2)]">
+<span class="material-symbols-outlined text-5xl text-secondary mb-6" data-icon="terminal">terminal</span>
+<h3 class="text-xl font-bold mb-4">开发者工具</h3>
+<p class="text-on-surface-variant text-sm mb-8 leading-relaxed">简化概念设计与可执行代码之间的桥梁。</p>
+<button class="bg-secondary text-on-secondary px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs">探索工具</button>
+</div>
+</div>
+</div>
+<!-- Project Card 4: Web -->
+<div class="perspective-container h-[450px] flip-card group">
+<div class="flip-card-inner">
+<div class="flip-card-front glass-card rounded-lg overflow-hidden">
+<div class="h-2/3 overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="luxury fashion e-commerce website with large high-fashion photography and ultra-thin typography on black background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhNPhCxyDqkuGVgMBubCIpNpQLtiWa3GxT-WLna4cfl4s68CSP--SZsOIA9G90kw9OAtrHQPZ8I1PFud9qESVnTYp59Ctud5D4WGoaXyCkfbIBEl73UruT8RZJrYbaystmLUzi-3Nuk3NahwXJ3nY2cKR64NW7pS2u_2qoHms87XgMejRuPuKjWxjLda9CE8hK6d3eXX9FbK9nlF8yGXS_a-NM8ncPpT-QLMPoAJrsSOPOgKZXgSzbmxm60oz1ohq5FSU00JVN4g"/>
+</div>
+<div class="p-8">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-2xl font-bold tracking-tight">星际风尚</h3>
+<span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 bg-secondary/20 text-secondary rounded">网页</span>
+</div>
+<p class="text-on-surface-variant text-sm line-clamp-2">具有沉浸式 3D 产品可视化的顶级时尚店面。</p>
+</div>
+</div>
+<div class="flip-card-back glass-card rounded-lg p-10 flex flex-col justify-center items-center text-center border-2 border-primary/40 shadow-[0_0_50px_rgba(145,182,255,0.2)]">
+<span class="material-symbols-outlined text-5xl text-primary mb-6" data-icon="shopping_bag">shopping_bag</span>
+<h3 class="text-xl font-bold mb-4">商业 2.0</h3>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs">查看实况</button>
+</div>
+</div>
+</div>
+<!-- Project Card 5: Tools -->
+<div class="perspective-container h-[450px] flip-card group md:translate-y-12">
+<div class="flip-card-inner">
+<div class="flip-card-front glass-card rounded-lg overflow-hidden">
+<div class="h-2/3 overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="futuristic music production software interface with glowing sound waves and orbital control knobs" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-3nQGYJQzgbcILLKWNIFEF1MF_y-6SZCRdtZoELlCBJFOP5ffjcQjg3SPDlbZ9rpuDRo2fhk6WFMafxAKmlhB5xtK7jo68aLwb7WsRuHHI9jGzZRTun2XtVZOiuK2CSzhA5T2tzPI1mtDlkg0anwu3NXR03KwtX7a68_f6dIWN17FXqSOcng1JiKqKkVv4UdsSfyfM-PMjZg5a1mfQZ_hfMKNteTXqpzTfhEyS61CZiQhwKjwtzyjmKOZpNOe29XXcLxjJ-adUQ"/>
+</div>
+<div class="p-8">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-2xl font-bold tracking-tight">音速轨道</h3>
+<span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 bg-secondary/20 text-secondary rounded">工具</span>
+</div>
+<p class="text-on-surface-variant text-sm line-clamp-2">使用轨道力学逻辑的实验性音频合成引擎。</p>
+</div>
+</div>
+<div class="flip-card-back glass-card rounded-lg p-10 flex flex-col justify-center items-center text-center border-2 border-secondary/40 shadow-[0_0_50px_rgba(130,209,236,0.2)]">
+<span class="material-symbols-outlined text-5xl text-secondary mb-6" data-icon="graphic_eq">graphic_eq</span>
+<h3 class="text-xl font-bold mb-4">音频工程</h3>
+<button class="bg-secondary text-on-secondary px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs">启动应用</button>
+</div>
+</div>
+</div>
+<!-- Project Card 6: Brand -->
+<div class="perspective-container h-[450px] flip-card group">
+<div class="flip-card-inner">
+<div class="flip-card-front glass-card rounded-lg overflow-hidden">
+<div class="h-2/3 overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="complete brand system mockup featuring stationary, business cards, and packaging in a clean architectural setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvplTzDMiD4mSBFQ7XvELlqXdskuLKrurndwdOI1NVEAC4Z2hVMsC_BxsrZsxn8DJ3Hea6uY2RzSS-Js7OITdhzwEJtKRMvxZ5tFVvvKRtH8NLGeahTJCMORnhjUtNW3UJucJJ2OFC98H_vVOapORkfTLUnEB9-tHGn2pLmmOwbb8jtmtry2O3ZVcdtOXpEWf5r4oW0LnanebNtxZDF1YTzW1nMWMCm-CInHG1WNyu9otwDSnSRZlk7yxgO1zs-iOeuse91cnvfg"/>
+</div>
+<div class="p-8">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-2xl font-bold tracking-tight">巨石 Pro</h3>
+<span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 bg-tertiary/20 text-tertiary rounded">品牌</span>
+</div>
+<p class="text-on-surface-variant text-sm line-clamp-2">为东京的一个建筑集团进行的全面品牌重塑。</p>
+</div>
+</div>
+<div class="flip-card-back glass-card rounded-lg p-10 flex flex-col justify-center items-center text-center border-2 border-tertiary/40 shadow-[0_0_50px_rgba(208,188,255,0.2)]">
+<span class="material-symbols-outlined text-5xl text-tertiary mb-6" data-icon="architecture">architecture</span>
+<h3 class="text-xl font-bold mb-4">结构与虚空</h3>
+<button class="bg-tertiary text-on-tertiary px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs">查看品牌</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Call to Action Section -->
+<section class="mt-40 glass-card rounded-xl p-12 md:p-20 text-center relative overflow-hidden">
+<div class="absolute inset-0 bg-primary/5 -z-10"></div>
+<h2 class="text-4xl md:text-6xl font-extrabold tracking-tighter mb-8 leading-none">准备好启动你的<span class="text-tertiary">空间站了吗？</span></h2>
+<p class="max-w-xl mx-auto text-on-surface-variant mb-12">我们目前正在接受 2025 年轨道的新委托。让我们一起创造超越数字地平线的作品。</p>
+<div class="flex flex-col md:flex-row justify-center gap-6">
+<button class="bg-primary text-on-primary px-10 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:shadow-[0_0_30px_rgba(145,182,255,0.4)] transition-all">发起项目</button>
+<button class="bg-transparent border border-outline px-10 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:bg-surface-variant transition-all">查看流程</button>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-slate-950 w-full relative bottom-0">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-20 gap-8 max-w-screen-2xl mx-auto">
+<div class="text-lg font-bold text-blue-200">星际工作室</div>
+<div class="flex gap-8">
+<a class="text-xs font-medium tracking-widest uppercase text-slate-500 hover:text-blue-400 transition-all hover:translate-x-1" href="#">隐私政策</a>
+<a class="text-xs font-medium tracking-widest uppercase text-slate-500 hover:text-blue-400 transition-all hover:translate-x-1" href="#">服务条款</a>
+<a class="text-xs font-medium tracking-widest uppercase text-slate-500 hover:text-blue-400 transition-all hover:translate-x-1" href="#">Instagram</a>
+<a class="text-xs font-medium tracking-widest uppercase text-slate-500 hover:text-blue-400 transition-all hover:translate-x-1" href="#">归档</a>
+</div>
+<p class="text-xs font-medium tracking-widest uppercase text-slate-500">© 2024 星际创意工作室。保留所有权利。</p>
+</div>
+</footer>
+</body></html>

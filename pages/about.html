@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary-dim": "#6e9df4",
+            "on-secondary-fixed": "#004656",
+            "on-error": "#490006",
+            "on-primary-fixed-variant": "#00438f",
+            "on-primary-container": "#00285b",
+            "secondary": "#82d1ec",
+            "primary": "#91b6ff",
+            "tertiary-container": "#c4acff",
+            "error-container": "#8a1a1e",
+            "inverse-on-surface": "#4c5566",
+            "inverse-primary": "#275daf",
+            "tertiary-dim": "#ab8afd",
+            "secondary-fixed-dim": "#91e0fa",
+            "on-background": "#d9e6ff",
+            "on-tertiary-container": "#41198d",
+            "surface-container": "#0b1a2e",
+            "primary-fixed": "#a3c1ff",
+            "tertiary-fixed-dim": "#b89bff",
+            "surface-dim": "#050e1c",
+            "secondary-fixed": "#b4ebff",
+            "on-tertiary-fixed-variant": "#4a2696",
+            "outline-variant": "#354965",
+            "secondary-dim": "#74c4de",
+            "background": "#050e1c",
+            "on-secondary-container": "#5eaec8",
+            "surface-variant": "#112641",
+            "primary-fixed-dim": "#8cb3ff",
+            "tertiary-fixed": "#c4acff",
+            "surface": "#050e1c",
+            "on-tertiary-fixed": "#290068",
+            "on-primary": "#00336f",
+            "error": "#ff716c",
+            "on-primary-fixed": "#002657",
+            "surface-container-high": "#0e2037",
+            "surface-container-lowest": "#000000",
+            "on-tertiary": "#4b2797",
+            "surface-tint": "#91b6ff",
+            "on-error-container": "#ff9993",
+            "on-surface-variant": "#98accd",
+            "on-surface": "#d9e6ff",
+            "surface-container-low": "#071425",
+            "on-secondary": "#004757",
+            "inverse-surface": "#f9f9ff",
+            "error-dim": "#c94947",
+            "primary-container": "#79a8ff",
+            "tertiary": "#d0bcff",
+            "surface-bright": "#152d4b",
+            "outline": "#637695",
+            "on-secondary-fixed-variant": "#00647a",
+            "secondary-container": "#002a35",
+            "surface-container-highest": "#112641"
+          },
+          fontFamily: {
+            "headline": ["Inter"],
+            "body": ["Inter"],
+            "label": ["Inter"]
+          },
+          borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #050e1c;
+      color: #d9e6ff;
+      font-family: 'Inter', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .glass-panel {
+      background: rgba(11, 26, 46, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(158, 191, 255, 0.1);
+    }
+    .text-glow {
+      text-shadow: 0 0 20px rgba(145, 182, 255, 0.3);
+    }
+    .celestial-gradient {
+      background: linear-gradient(135deg, rgba(145, 182, 255, 0.1) 0%, rgba(208, 188, 255, 0.05) 100%);
+    }
+  </style>
+</head>
+<body class="selection:bg-primary/30 selection:text-primary overflow-x-hidden">
+  <a href="../index.html" class="fixed top-6 left-6 z-[100] flex items-center pointer-events-auto gap-2 text-white/80 hover:text-white transition-colors bg-white/10 backdrop-blur px-4 py-2 rounded-full text-sm font-medium border border-white/10">
+    <span class="material-symbols-outlined text-sm">arrow_back</span> 返回首页
+  </a>
+
+<!-- Unified Top Navigation -->
+
+<header class="fixed top-6 left-0 right-0 z-40 pointer-events-none flex items-center justify-between max-w-7xl mx-auto px-6">
+  <nav class="pointer-events-auto bg-[#0c182a]/78 backdrop-blur-xl sticky top-6 mx-auto w-fit rounded-full px-8 py-3 border border-[#9ebfff]/15 shadow-[0_20px_60px_rgba(145,182,255,0.1)] flex items-center gap-8">
+    <a class="text-2xl font-extrabold tracking-tighter text-[#91b6ff] mr-8 flex items-center gap-2" href="../index.html">
+      <span class="grid place-items-center w-8 h-8 rounded-full bg-gradient-to-br from-[#79a8ff] to-[#ad8cff] text-[#04101f] text-sm">XY</span>
+      星雨作坊
+    </a>
+    <div class="hidden md:flex items-center gap-6">
+      <a class="text-[#98accd] hover:text-[#d9e6ff] transition-colors text-sm font-semibold" href="../index.html#about">社团简介</a>
+      <a class="text-[#98accd] hover:text-[#d9e6ff] transition-colors text-sm font-semibold" href="../index.html#members">人员介绍</a>
+      <a class="text-[#98accd] hover:text-[#d9e6ff] transition-colors text-sm font-semibold" href="../index.html#products">产品展示</a>
+      <a class="text-[#98accd] hover:text-[#d9e6ff] transition-colors text-sm font-semibold" href="../index.html#open-source">开源精神</a>
+    </div>
+    <a href="join.html" class="ml-8 bg-gradient-to-br from-[#79a8ff] to-[#95e4ff] text-[#03111f] shadow-[0_16px_40px_rgba(121,168,255,0.25)] px-6 py-2 rounded-full text-sm font-bold hover:-translate-y-0.5 transition-transform duration-200">加入我们</a>
+  </nav>
+</header>
+
+
+
+<main class="relative pt-32">
+<!-- Hero Section -->
+<section class="px-8 max-w-screen-2xl mx-auto mb-40 text-center relative">
+<div class="absolute -top-20 left-1/2 -translate-x-1/2 w-full h-[600px] opacity-20 blur-[120px] pointer-events-none" style="background: radial-gradient(circle, #91b6ff 0%, #050e1c 70%);"></div>
+<label class="text-primary font-label text-xs tracking-[0.4em] uppercase mb-6 block">星辰传承</label>
+<h1 class="text-7xl md:text-[120px] font-black tracking-tighter leading-none mb-8 text-glow">
+        星雨 <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-tertiary">作坊</span>
+</h1>
+<p class="max-w-2xl mx-auto text-on-surface-variant text-lg leading-relaxed mb-12">
+        一个重塑代码与设计边界的精英数字共同体。我们诞生于精细工艺与开放云端无限潜能的交汇之处。
+      </p>
+<div class="flex flex-wrap justify-center gap-6">
+<div class="flex items-center gap-3 px-6 py-3 rounded-full glass-panel border border-primary/20">
+<span class="material-symbols-outlined text-primary" data-icon="stars">stars</span>
+<span class="font-bold text-sm">始于 2018</span>
+</div>
+<div class="flex items-center gap-3 px-6 py-3 rounded-full glass-panel border border-secondary/20">
+<span class="material-symbols-outlined text-secondary" data-icon="hub">hub</span>
+<span class="font-bold text-sm">四大核心矩阵</span>
+</div>
+</div>
+</section>
+<!-- Core Values Section (Asymmetric Bento) -->
+<section class="px-8 max-w-screen-2xl mx-auto mb-56">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<div class="md:col-span-5 flex flex-col justify-center mb-12 md:mb-0">
+<h2 class="text-5xl font-extrabold tracking-tight mb-8">我们的星辰 <br/><span class="text-primary">法则</span></h2>
+<p class="text-on-surface-variant text-lg max-w-md">源于对极致的渴望，以及对科技生态共同成长的坚定承诺。</p>
+</div>
+<div class="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
+<!-- Craftsmanship -->
+<div class="glass-panel p-10 rounded-lg celestial-gradient group hover:translate-y-[-8px] transition-all duration-500">
+<div class="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="diamond" data-weight="fill" style="font-variation-settings: 'FILL' 1;">diamond</span>
+</div>
+<h3 class="text-2xl font-bold mb-4">匠心独运</h3>
+<p class="text-on-surface-variant leading-relaxed">像素级的精准。代码级的稳健。我们将每一款产品视为数字宇宙中永恒的艺术品。</p>
+</div>
+<!-- Open Source -->
+<div class="glass-panel p-10 rounded-lg celestial-gradient group hover:translate-y-[-8px] transition-all duration-500 sm:mt-12">
+<div class="w-16 h-16 bg-secondary/10 rounded-xl flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-secondary text-4xl" data-icon="public" data-weight="fill" style="font-variation-settings: 'FILL' 1;">public</span>
+</div>
+<h3 class="text-2xl font-bold mb-4">开源精神</h3>
+<p class="text-on-surface-variant leading-relaxed">知识属于共同体。我们回馈那些支撑我们创新的代码库，孕育透明开放的文化。</p>
+</div>
+<!-- Collaboration -->
+<div class="sm:col-span-2 glass-panel p-10 rounded-lg celestial-gradient group hover:translate-y-[-8px] transition-all duration-500">
+<div class="flex flex-col md:flex-row gap-8 items-start">
+<div class="w-16 h-16 bg-tertiary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-tertiary text-4xl" data-icon="group_work" data-weight="fill" style="font-variation-settings: 'FILL' 1;">group_work</span>
+</div>
+<div>
+<h3 class="text-2xl font-bold mb-4">极致协作</h3>
+<p class="text-on-surface-variant leading-relaxed max-w-xl">打破工程与艺术的壁垒。我们如同一个统一的神经系统般运转，让个体的光芒放大集体的力量。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Organizational Structure (4 Groups) -->
+<section class="bg-surface-container-low py-32 px-8 overflow-hidden relative">
+<div class="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBoyxWBBFlwn4vFPTUGn27f_Qmv5iRPCV5_5XoQrFEBMFyJ80kF4DmneXeYUL9tXFv3rny31dh_u8aQ453WoFidhNmOYACu7MuifGBOTD9RNI43T6Kx6ORP6F9kY6puay4xUDzoWCrpaT_R9JidK-MQp1U0LJ3OWF91qxyYC4K4F9c_Rhm4BOaK2lxoiJS1xlBmPMp42sEQK5_W-jGKIXQWKKwigiiXxFiuu2nYcl00huGZ_Vtd5--WSyBzFTaW35qu-uru-cUZyQ');"></div>
+<div class="max-w-screen-2xl mx-auto relative z-10">
+<div class="text-center mb-24">
+<h2 class="text-6xl font-black tracking-tight mb-6">四大星系</h2>
+<p class="text-on-surface-variant max-w-xl mx-auto">环绕同一颗创意太阳运转的专业智慧节点。</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Liuguang -->
+<div class="glass-panel p-1 bg-gradient-to-br from-primary/30 to-transparent rounded-lg">
+<div class="bg-surface-container h-full p-8 rounded-lg">
+<span class="text-primary font-black text-6xl opacity-10 absolute right-8 top-8">01</span>
+<div class="mb-12 h-40 flex items-center justify-center">
+<img class="h-32 w-auto object-contain" data-alt="abstract 3d glass sphere reflecting glowing blue light trails on a dark background representing energy and speed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPNR0WFwViOLMcWR-9FDpQrY98lLAVztOKCzQfBNy4anVJyLUDRaLxyqAtYz4ObqHD-1ZV2YpooDUE2gLFcXcdSpxS1GGtlL9S3K3XhKwkGhS7V4HGOeYBORKX7cvafE5_N1DYBCVDpR96muAdrVJMoQz79XBVJWfwyaYZU0SXJLiIKn_fqoe_UthBOcWsQTbagq9BdcGPnXLmnEMD2lQf_3z2lOEMnkJaTSvbN12h8jQ8iB-qcaduTWSkwNIT0NFSJjP7vwHbqw"/>
+</div>
+<h4 class="text-2xl font-bold mb-2">流光</h4>
+<p class="text-primary text-sm font-bold uppercase tracking-widest mb-6">视觉与动效</p>
+<p class="text-on-surface-variant text-sm leading-relaxed">掌控光影与运动的物理法则，打造触动感官的沉浸式数字品牌体验。</p>
+</div>
+</div>
+<!-- Xinghui -->
+<div class="glass-panel p-1 bg-gradient-to-br from-secondary/30 to-transparent rounded-lg lg:mt-8">
+<div class="bg-surface-container h-full p-8 rounded-lg">
+<span class="text-secondary font-black text-6xl opacity-10 absolute right-8 top-8">02</span>
+<div class="mb-12 h-40 flex items-center justify-center">
+<img class="h-32 w-auto object-contain" data-alt="3d crystal geometric structure glowing with cyan energy pulses signifying computational intelligence and complex nodes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkRG94dHb0bqV_L7wK9uIyyUKVLM6UEB3JG4bbNDm7JTpp5iEGnR0jniyeRZDk7-EhOdQ-La-UYFWRbCexP9KKChvgChQsaLQFyHKv4BuhmM2d_h8U8KfY6Hwd13vTcI5CoXqAtxHBRkVzrEWmDoT18RAF4qlLD-GJgCb3CirkVtqL71_7AXpGN4GMF6LTHYGjw6jFYRL4yAamOS4LHhg-k748LLV_NI9rTsLQHf1tb_oHujDjPzY-SNEI3JUn0qhH_2PHd4tysA"/>
+</div>
+<h4 class="text-2xl font-bold mb-2">星辉</h4>
+<p class="text-secondary text-sm font-bold uppercase tracking-widest mb-6">核心工程</p>
+<p class="text-on-surface-variant text-sm leading-relaxed">架构的脊梁。构建可扩展、低延迟的系统，驱动高性能的 Web 与移动应用。</p>
+</div>
+</div>
+<!-- Zhuyun -->
+<div class="glass-panel p-1 bg-gradient-to-br from-tertiary/30 to-transparent rounded-lg">
+<div class="bg-surface-container h-full p-8 rounded-lg">
+<span class="text-tertiary font-black text-6xl opacity-10 absolute right-8 top-8">03</span>
+<div class="mb-12 h-40 flex items-center justify-center">
+<img class="h-32 w-auto object-contain" data-alt="soft 3d purple nebulous clouds swirling around a central metallic sphere representing cloud computing and atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGAtqZFnXnqlC2bNwnAZ51ZYAPkQ0JogcJkUM677lJkD0pYaP41aP75mNnhaqVdFOt7KyHMNhnhYHAt-sHpEu7Fb7YRmK-86QBW2_65WQvNdAPJn6FM-N2ScRGlIlkqUUY0O4L66DKavEoo55xTBVQazJpNGtKqh15GMMqaI_Z52p5O0FGrmW_GqgkaMFJ5-myc0zzVYGZzEN2bx4q8FO4UH6pWWmkPBWG5YfJReVFkBlZfWMh6UfvnN4X1ZOqEJD0HIgKNFRZ9Q"/>
+</div>
+<h4 class="text-2xl font-bold mb-2">筑云</h4>
+<p class="text-tertiary text-sm font-bold uppercase tracking-widest mb-6">云端与运维</p>
+<p class="text-on-surface-variant text-sm leading-relaxed">优化数字平流层。托管基础设施，自动化部署，以及坚不可摧的安全协议。</p>
+</div>
+</div>
+<!-- Huisheng -->
+<div class="glass-panel p-1 bg-gradient-to-br from-white/10 to-transparent rounded-lg lg:mt-8">
+<div class="bg-surface-container h-full p-8 rounded-lg">
+<span class="text-white font-black text-6xl opacity-10 absolute right-8 top-8">04</span>
+<div class="mb-12 h-40 flex items-center justify-center">
+<img class="h-32 w-auto object-contain" data-alt="3d stylized sound waves made of liquid silver vibrating in space representing communication and sonic identity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuzdGIe7uUkn-OKhFFlNlFtdksA0o_ClbAh-lD2vGmTgFKtvRoQ4mIYWjKY1CPYpqMm5TBKKzets3iYU-_Y7mB7F1mKRzd2SJsAmL_uoGz8ZTyeq3XRjGBnFxaTX1FcYQ6jaxW89nKtms65NukNqwEJSOzOcwL5ZdU3KyBOc9q7ls8L5ElwV9Ch0JZxkRjBFeujyIMiHeHmzV5S7NMO-H2sascEFg8kfwdqzuXXSSbXypPPIQx93lzysXJrevRKWA0KGZwoKjKeQ"/>
+</div>
+<h4 class="text-2xl font-bold mb-2">回声</h4>
+<p class="text-on-surface text-sm font-bold uppercase tracking-widest mb-6">体验与研究</p>
+<p class="text-on-surface-variant text-sm leading-relaxed">用户之声。将深度的心理学研究转化为直观的流程与共鸣驱动的交互模型。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Club History (Vertical Editorial Timeline) -->
+<section class="px-8 max-w-screen-xl mx-auto py-56">
+<div class="flex flex-col md:flex-row gap-20">
+<div class="md:w-1/3 sticky top-32 h-fit">
+<label class="text-tertiary font-label text-xs tracking-[0.4em] uppercase mb-6 block">演进</label>
+<h2 class="text-6xl font-black tracking-tighter leading-tight">我们的 <br/>星际航行</h2>
+</div>
+<div class="md:w-2/3 space-y-32 border-l border-outline-variant/30 pl-12 relative">
+<!-- Timeline point 1 -->
+<div class="relative">
+<div class="absolute -left-[54px] top-0 w-3 h-3 rounded-full bg-primary ring-8 ring-primary/10"></div>
+<span class="text-4xl font-black text-primary block mb-4">2018</span>
+<h3 class="text-2xl font-bold mb-6">奇点降临</h3>
+<p class="text-on-surface-variant text-lg leading-relaxed mb-8">起初，这只是由三名开发者和一名设计师在地下室作坊组成的公会。使命很简单：创造兼具美感与坚不可摧的事物。</p>
+<div class="rounded-lg overflow-hidden glass-panel p-1">
+<img class="w-full aspect-video object-cover rounded-lg" data-alt="minimalist black and white photo of a dark modern workspace with multiple glowing computer monitors and neon blue accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvy_Z76V64sbKto7NhBhcgoJ1Mq8bYflevWU7kfnpEG5xWXe7-eiLnR3lkgA5xuh9fAr6i30VYKBohGvKIPtjDGs2cvV34md7UlleghYhRtjL3x5XOLtsN9w4P-5NAxQv_vA7W19DH2wwhxMBZ6lRWqTWD-zcR84k4kLpjkhvXT9ND_F5WxmdC0274TJMjxoE3LupbVszEzJhxLYKbUHLKlNxAgA7l_3PNQ7ETqVn1KA_wvtXhw5yR0146qRTQlo7ljoNEiEyzDw"/>
+</div>
+</div>
+<!-- Timeline point 2 -->
+<div class="relative">
+<div class="absolute -left-[54px] top-0 w-3 h-3 rounded-full bg-secondary ring-8 ring-secondary/10"></div>
+<span class="text-4xl font-black text-secondary block mb-4">2021</span>
+<h3 class="text-2xl font-bold mb-6">全球扩张</h3>
+<p class="text-on-surface-variant text-lg leading-relaxed mb-8">采用远程优先的组织架构，吸引了横跨三大洲的顶尖人才。这个时代见证了我们四大核心智慧星系的诞生。</p>
+<div class="rounded-lg overflow-hidden glass-panel p-1">
+<img class="w-full aspect-video object-cover rounded-lg" data-alt="abstract digital visualization of connecting nodes across a global map glowing with electric blue and white light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx67Sy_SnFxUy4_lA-bW0rZt0YdYuOuQedggRfWmNuPN4L-H-VnOgIM0HgBT8C-5llgx55NCjG3Y_VDmW9-bsGRUvuBs3F_3HVpRvBQTuVxkYCEEsVJzFGb3nNMEsYJVGLdbi94Ua72ZVFdNGEiOElMH3Tf3Fw6IOtaS1CSurt6P_mPRwedoZebqXbXczIyFmqo85CwajShtJL_9gazibnHn-SdSZ7H8A5M9oaoYa55TEDvafDpThKTWCNEFr5L5MzBvEWplAGWQ"/>
+</div>
+</div>
+<!-- Timeline point 3 -->
+<div class="relative">
+<div class="absolute -left-[54px] top-0 w-3 h-3 rounded-full bg-tertiary ring-8 ring-tertiary/10"></div>
+<span class="text-4xl font-black text-tertiary block mb-4">2024</span>
+<h3 class="text-2xl font-bold mb-6">深入云海</h3>
+<p class="text-on-surface-variant text-lg leading-relaxed mb-8">转向融合 AI 的生态系统与高度个性化的数字环境。当我们探索可能性的边缘时，这段旅程仍在继续。</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="px-8 max-w-screen-2xl mx-auto mb-40">
+<div class="glass-panel p-20 rounded-xl text-center relative overflow-hidden">
+<div class="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+<div class="absolute bottom-0 left-0 w-96 h-96 bg-tertiary/10 blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
+<h2 class="text-5xl font-black mb-8 relative z-10">渴望加入这片星群？</h2>
+<p class="text-on-surface-variant text-xl mb-12 max-w-xl mx-auto relative z-10">我们始终在寻找具有远见卓识的头脑，以帮助我们绘制数字领域的下一个前沿。</p>
+<div class="flex flex-col sm:flex-row justify-center gap-6 relative z-10">
+<button class="bg-primary hover:bg-primary-dim text-on-primary font-bold px-10 py-4 rounded-full transition-all text-lg shadow-lg shadow-primary/20">查看开放职位</button>
+<button class="border border-outline hover:bg-white/5 text-on-surface font-bold px-10 py-4 rounded-full transition-all text-lg">咨询作坊</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-slate-950 w-full relative bottom-0">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-20 gap-8 max-w-screen-2xl mx-auto">
+<div class="flex flex-col items-center md:items-start">
+<div class="text-lg font-bold text-blue-200 mb-4">星雨作坊</div>
+<p class="text-xs font-medium tracking-widest uppercase text-slate-500">© 2024 星际创意作坊。保留所有权利。</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-xs font-medium tracking-widest uppercase text-slate-500 hover:text-blue-400 transition-colors duration-300 hover:translate-x-1" href="#">隐私政策</a>
+<a class="text-xs font-medium tracking-widest uppercase text-slate-500 hover:text-blue-400 transition-colors duration-300 hover:translate-x-1" href="#">服务条款</a>
+<a class="text-xs font-medium tracking-widest uppercase text-slate-500 hover:text-blue-400 transition-colors duration-300 hover:translate-x-1" href="#">Instagram</a>
+<a class="text-xs font-medium tracking-widest uppercase text-slate-500 hover:text-blue-400 transition-colors duration-300 hover:translate-x-1" href="#">归档</a>
+</div>
+</div>
+</footer>
+</body></html>
