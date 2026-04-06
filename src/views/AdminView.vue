@@ -1,5 +1,13 @@
 <template>
-  <div class="admin-layout">
+  <div
+    :class="[
+      'admin-layout',
+      {
+        'sidebar-collapsed': isSidebarCollapsed,
+        'sidebar-compact': isCompactViewport
+      }
+    ]"
+  >
     <!-- 登录界面 -->
     <div v-if="!isLoggedIn" class="login-container">
       <div class="login-card">
@@ -45,12 +53,22 @@
     <template v-else>
       <AdminSidebar 
         :active-section="activeSection"
+        :collapsed="isSidebarCollapsed"
+        :is-compact="isCompactViewport"
+        :is-open="isSidebarOpen"
         @change-section="changeSection"
         @export="handleExport"
         @import="handleImport"
         @reset="handleReset"
         @logout="handleLogout"
+        @toggle="toggleSidebar"
       />
+
+      <div
+        v-if="isCompactViewport && isSidebarOpen"
+        class="sidebar-backdrop"
+        @click="closeSidebar"
+      ></div>
       
       <div class="admin-main">
         <AdminHeader 
@@ -58,8 +76,11 @@
           :is-dirty="isDirty"
           :is-saving="isSaving"
           :username="currentUser?.username"
+          :sidebar-collapsed="isSidebarCollapsed"
+          :is-compact="isCompactViewport"
           @save="handleSave"
           @preview="handlePreview"
+          @toggle-sidebar="toggleSidebar"
         />
         
         <main class="admin-content">
@@ -190,6 +211,9 @@ const showResetConfirm = ref(false)
 const previewUrl = ref('/')
 const pagesRefreshToken = ref(0)
 const pagesEditorRef = ref(null)
+const isSidebarCollapsed = ref(false)
+const isCompactViewport = ref(false)
+const isSidebarOpen = ref(true)
 
 async function handleLogin() {
   if (isLoggingIn.value) return
@@ -232,6 +256,9 @@ async function checkAuth() {
 
 function changeSection(section) {
   activeSection.value = section
+  if (isCompactViewport.value) {
+    isSidebarOpen.value = false
+  }
 }
 
 function markDirty() {
@@ -329,6 +356,31 @@ async function confirmReset() {
   }
 }
 
+function syncSidebarState() {
+  const compact = window.innerWidth <= 1024
+  isCompactViewport.value = compact
+  if (compact) {
+    isSidebarCollapsed.value = false
+    isSidebarOpen.value = false
+    return
+  }
+  isSidebarOpen.value = true
+}
+
+function toggleSidebar() {
+  if (isCompactViewport.value) {
+    isSidebarOpen.value = !isSidebarOpen.value
+    return
+  }
+  isSidebarCollapsed.value = !isSidebarCollapsed.value
+}
+
+function closeSidebar() {
+  if (isCompactViewport.value) {
+    isSidebarOpen.value = false
+  }
+}
+
 function handleBeforeUnload(e) {
   if (isDirty.value) {
     e.preventDefault()
@@ -338,19 +390,27 @@ function handleBeforeUnload(e) {
 
 onMounted(() => {
   checkAuth()
+  syncSidebarState()
   window.addEventListener('beforeunload', handleBeforeUnload)
+  window.addEventListener('resize', syncSidebarState)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('beforeunload', handleBeforeUnload)
+  window.removeEventListener('resize', syncSidebarState)
 })
 </script>
 
 <style scoped>
 .admin-layout {
+  --admin-sidebar-width: 260px;
   display: flex;
   min-height: 100vh;
   background: var(--bg);
+}
+
+.admin-layout.sidebar-collapsed {
+  --admin-sidebar-width: 88px;
 }
 
 .login-container {
@@ -466,16 +526,27 @@ onBeforeUnmount(() => {
 
 .admin-main {
   flex: 1;
-  margin-left: 260px;
+  margin-left: var(--admin-sidebar-width);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-width: 0;
+  transition: margin-left 0.24s ease;
 }
 
 .admin-content {
   flex: 1;
   padding: 32px;
-  max-width: 900px;
+  width: 100%;
+  max-width: 1400px;
+  box-sizing: border-box;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 90;
 }
 
 .loading-state,
