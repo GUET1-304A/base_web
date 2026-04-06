@@ -60,5 +60,148 @@ export const defaultSiteConfig = {
         description: '负责活动记录、产品推广、社媒运营与社区维护，让作品被更多人看到，也让成员经验持续沉淀。'
       }
     ]
+  },
+  products: {
+    title: '产品展示',
+    description: '以下内容为官网展示模板，你后续可以替换为社团真实项目名称、截图、简介与仓库链接。',
+    categories: ['精选总览', '网站平台', '效率工具', '品牌内容'],
+    slides: [
+      {
+        tag: '精选总览',
+        title: '从灵感、工具到传播，形成完整作品链路',
+        description: '星雨作坊的产品并不是孤立存在的单点项目，而是围绕真实需求持续迭代的作品群。我们希望每一项作品都能成为下一项作品的起点。',
+        metrics: [
+          { value: '03', label: '核心章节' },
+          { value: '06', label: '示例作品' },
+          { value: '∞', label: '持续迭代' }
+        ],
+        projects: [
+          {
+            category: '网站平台',
+            name: '星图导航',
+            description: '为新成员与访客整理社团资讯、活动日历与学习路线的门户网站。',
+            link: '/onboarding',
+            coverClass: 'aurora'
+          },
+          {
+            category: '效率工具',
+            name: '雨记协作板',
+            description: '支持任务拆分、进度同步与复盘记录的轻量化协作工具。',
+            link: '/yuji',
+            coverClass: 'meteor'
+          },
+          {
+            category: '品牌内容',
+            name: '星雨年刊',
+            description: '沉淀年度作品、社团故事和成员成长轨迹的数字刊物与视觉专题。',
+            link: '/timeline',
+            coverClass: 'nebula'
+          }
+        ]
+      },
+      {
+        tag: '网站平台',
+        title: '把服务入口和活动体验做成可持续迭代的平台',
+        description: '这一类项目强调信息组织、交互体验与系统稳定性，通常会面向成员、访客或校园用户提供长期使用的服务入口。',
+        metrics: [],
+        projects: [
+          {
+            category: '网站平台',
+            name: '星图导航',
+            description: '为新成员与访客整理社团资讯、活动日历与学习路线的门户网站。',
+            link: '/onboarding',
+            coverClass: 'aurora'
+          },
+          {
+            category: '网站平台',
+            name: '活动报名系统',
+            description: '用于活动预告、报名管理和数据统计，帮助组织流程更顺畅。',
+            link: '',
+            coverClass: 'cosmos'
+          }
+        ]
+      },
+      {
+        tag: '效率工具',
+        title: '把协作过程也设计成产品，让创作效率持续提升',
+        description: '这类作品更关注成员内部的协同、记录与复盘，希望通过轻量工具减少沟通成本，让创作和执行更流畅。',
+        metrics: [],
+        projects: [
+          {
+            category: '效率工具',
+            name: '雨记协作板',
+            description: '支持任务拆分、进度同步与复盘记录的轻量化协作工具。',
+            link: '/yuji',
+            coverClass: 'meteor'
+          },
+          {
+            category: '效率工具',
+            name: '灵感收集箱',
+            description: '面向社团成员的灵感归档空间，方便记录选题、链接和碎片创意。',
+            link: '',
+            coverClass: 'pulse'
+          }
+        ]
+      },
+      {
+        tag: '品牌内容',
+        title: '让作品被看见，也让社团的成长被长久保存',
+        description: '这一部分更关注视觉表达、内容包装和公开传播，让社团成果能够以更完整、更动人的方式被外界感知。',
+        metrics: [],
+        projects: [
+          {
+            category: '品牌内容',
+            name: '星雨年刊',
+            description: '沉淀年度作品、社团故事和成员成长轨迹的数字刊物与视觉专题。',
+            link: '/timeline',
+            coverClass: 'nebula'
+          },
+          {
+            category: '品牌内容',
+            name: '开放分享计划',
+            description: '将讲座回顾、教程文章和项目经验整理成公开可访问的内容合集。',
+            link: '/blog',
+            coverClass: 'horizon'
+          }
+        ]
+      }
+    ]
+  },
+  openSource: {
+    title: '开源精神',
+    description: '对星雨作坊来说，开源不只是把代码放出来，更是把过程、思考和经验主动分享出去。',
+    items: [
+      {
+        title: '共享知识',
+        description: '把文档、教程、设计稿和项目复盘留下来，让后来者可以站在前人的经验上继续前进。'
+      },
+      {
+        title: '鼓励协作',
+        description: '欢迎成员互相 review、共同维护项目，也欢迎外部同学提出 issue、建议和改进方案。'
+      },
+      {
+        title: '持续迭代',
+        description: '开源意味着作品不是一次性交付，而是会随着需求、反馈与技术演进不断完善。'
+      }
+    ],
+    joinBanner: {
+      eyebrow: 'JOIN US',
+      title: '如果你也相信"做作品比只谈想法更重要"，欢迎加入星雨作坊。',
+      primaryButton: {
+        text: '加入我们',
+        link: '/join'
+      },
+      secondaryButton: {
+        text: '招新信息',
+        link: '/recruitment'
+      }
+    }
+  },
+  footer: {
+    brand: '星雨作坊 Xingyu Studio',
+    slogan: '以协作连接灵感，以开源延续成长。'
+  },
+  system: {
+    feishuWebhookUrl: ''
   }
 };

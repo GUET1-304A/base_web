@@ -10,7 +10,7 @@
       <RouterLink :to="{ name: 'home', hash: '#products' }">产品展示</RouterLink>
       <RouterLink :to="{ name: 'home', hash: '#open-source' }">开源精神</RouterLink>
     </nav>
-    <a class="nav-cta" href="/pages/join.html">加入我们</a>
+    <a class="nav-cta" href="/join">加入我们</a>
   </header>
 </template>
 
