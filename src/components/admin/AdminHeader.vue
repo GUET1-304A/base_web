@@ -1,6 +1,9 @@
 <template>
   <header class="admin-header">
     <div class="header-left">
+      <button class="sidebar-toggle" type="button" @click="$emit('toggle-sidebar')">
+        <span>{{ isCompact || sidebarCollapsed ? '☰' : '☷' }}</span>
+      </button>
       <h1 class="header-title">{{ sectionTitle }}</h1>
       <span v-if="isDirty" class="unsaved-badge">未保存</span>
     </div>
@@ -52,10 +55,18 @@ const props = defineProps({
   username: {
     type: String,
     default: ''
+  },
+  sidebarCollapsed: {
+    type: Boolean,
+    default: false
+  },
+  isCompact: {
+    type: Boolean,
+    default: false
   }
 })
 
-defineEmits(['save', 'preview'])
+defineEmits(['save', 'preview', 'toggle-sidebar'])
 
 const sectionTitles = {
   hero: 'Hero 区域编辑',
@@ -91,6 +102,22 @@ const sectionTitle = computed(() => sectionTitles[props.activeSection] || '内�
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.sidebar-toggle {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(121, 168, 255, 0.3);
 }
 
 .header-title {
@@ -164,5 +191,28 @@ const sectionTitle = computed(() => sectionTitles[props.activeSection] || '内�
 .save-btn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 4px 20px rgba(121, 168, 255, 0.3);
+}
+
+@media (max-width: 720px) {
+  .admin-header {
+    height: auto;
+    min-height: 64px;
+    padding: 12px 16px;
+    gap: 12px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .action-btn,
+  .user-info {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>
