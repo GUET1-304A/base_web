@@ -1,21 +1,4 @@
 services:
-  # MySQL 数据库
-  db:
-    image: mysql:8.0
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-xingyu_mysql_2026}
-      MYSQL_DATABASE: xingyu_cms
-      MYSQL_CHARACTER_SET_SERVER: utf8mb4
-      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   # Flask 后端
   backend:
     build: ./backend
@@ -24,14 +7,15 @@ services:
       FLASK_ENV: production
       SECRET_KEY: ${SECRET_KEY:-change-this-to-a-random-string}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-this-to-another-random-string}
-      MYSQL_HOST: db
-      MYSQL_PORT: 3306
-      MYSQL_USER: root
-      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-xingyu_mysql_2026}
-      MYSQL_DATABASE: xingyu_cms
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////app/data/xingyu_cms.db}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
       UPLOAD_FOLDER: /app/uploads
       APP_DEBUG: "false"
+      ALIYUN_ACCESS_KEY_ID: ${ALIYUN_ACCESS_KEY_ID:-}
+      ALIYUN_ACCESS_KEY_SECRET: ${ALIYUN_ACCESS_KEY_SECRET:-}
+      ALIYUN_OSS_ENDPOINT: ${ALIYUN_OSS_ENDPOINT:-}
+      ALIYUN_OSS_BUCKET_NAME: ${ALIYUN_OSS_BUCKET_NAME:-}
+      ALIYUN_OSS_CDN_URL: ${ALIYUN_OSS_CDN_URL:-}
       FEISHU_WEBHOOK_URL: ${FEISHU_WEBHOOK_URL:-}
       FEISHU_APP_ENABLED: ${FEISHU_APP_ENABLED:-false}
       FEISHU_APP_ID: ${FEISHU_APP_ID:-}
@@ -51,10 +35,8 @@ services:
       SMTP_FROM: ${SMTP_FROM:-}
       DEFAULT_GITHUB_URL: ${DEFAULT_GITHUB_URL:-https://github.com}
     volumes:
+      - db_data:/app/data
       - uploads_data:/app/uploads
-    depends_on:
-      db:
-        condition: service_healthy
 
   # Nginx 前端
   frontend:
@@ -69,5 +51,5 @@ services:
       - backend
 
 volumes:
-  mysql_data:
+  db_data:
   uploads_data:

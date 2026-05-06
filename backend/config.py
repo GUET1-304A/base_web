@@ -14,22 +14,17 @@ def _get_bool(name, default=False):
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'xingyu-studio-secret-key-2026'
-    MYSQL_HOST = os.environ.get('MYSQL_HOST') or 'localhost'
-    MYSQL_PORT = int(os.environ.get('MYSQL_PORT') or 3306)
-    MYSQL_USER = os.environ.get('MYSQL_USER') or 'root'
-    MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD') or ''
-    MYSQL_DATABASE = os.environ.get('MYSQL_DATABASE') or 'xingyu_cms'
-    
-    # 支持 DATABASE_URL 环境变量覆盖，或设置 USE_SQLITE=true 使用 SQLite
-    if os.environ.get('DATABASE_URL'):
-        SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
-    elif _get_bool('USE_SQLITE', False):
-        SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(BASE_DIR, 'xingyu_cms.db')}"
-    else:
-        SQLALCHEMY_DATABASE_URI = (
-            f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
-        )
+
+    # 数据库：默认使用 SQLite，设置 DATABASE_URL 可切换到 MySQL 等
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or f"sqlite:///{os.path.join(BASE_DIR, 'xingyu_cms.db')}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # 阿里云 OSS（配置后图片自动上传到 OSS，未配置则使用本地存储）
+    ALIYUN_ACCESS_KEY_ID = os.environ.get('ALIYUN_ACCESS_KEY_ID', '')
+    ALIYUN_ACCESS_KEY_SECRET = os.environ.get('ALIYUN_ACCESS_KEY_SECRET', '')
+    ALIYUN_OSS_ENDPOINT = os.environ.get('ALIYUN_OSS_ENDPOINT', '')
+    ALIYUN_OSS_BUCKET_NAME = os.environ.get('ALIYUN_OSS_BUCKET_NAME', '')
+    ALIYUN_OSS_CDN_URL = os.environ.get('ALIYUN_OSS_CDN_URL', '')
     
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'xingyu-jwt-secret-2026'
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)

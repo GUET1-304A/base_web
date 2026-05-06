@@ -9,6 +9,7 @@ from werkzeug.utils import secure_filename
 from models import db, SiteConfig, Page, AdminUser, Application
 from defaults import DEFAULT_SITE_CONFIG, DEFAULT_PAGES
 from application_flow import apply_application_action, send_status_email, send_status_update_card
+import oss_service
 
 admin_bp = Blueprint('admin', __name__)
 ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
@@ -383,7 +384,7 @@ def delete_application(application_id):
 @admin_bp.route('/upload-image', methods=['POST'])
 @jwt_required()
 def upload_image():
-    """上传图片文件"""
+    """上传图片文件（优先 OSS，回退本地存储）"""
     file = request.files.get('file')
 
     if not file or not file.filename:
@@ -395,16 +396,28 @@ def upload_image():
     original_name = secure_filename(file.filename)
     ext = os.path.splitext(original_name)[1].lower()
     filename = f"{uuid.uuid4().hex}{ext}"
-    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
 
     try:
-        file.save(file_path)
-        file_url = f"/uploads/{filename}"
+        oss_key = f"images/{filename}"
+        file_bytes = file.read()
+        oss_url = oss_service.upload_file(oss_key, file_bytes)
+
+        if oss_url:
+            return jsonify({
+                'success': True,
+                'message': '图片上传成功',
+                'filename': filename,
+                'url': oss_url
+            })
+
+        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        with open(file_path, 'wb') as f:
+            f.write(file_bytes)
         return jsonify({
             'success': True,
-            'message': '图片上传成功',
+            'message': '图片上传成功（本地存储）',
             'filename': filename,
-            'url': file_url
+            'url': f"/uploads/{filename}"
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
