@@ -8,6 +8,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from werkzeug.utils import secure_filename
 from models import db, SiteConfig, Page, AdminUser, Application
 from defaults import DEFAULT_SITE_CONFIG, DEFAULT_PAGES
+from application_flow import apply_application_action, send_status_email, send_status_update_card
 
 admin_bp = Blueprint('admin', __name__)
 ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
@@ -284,27 +285,96 @@ def update_application(application_id):
     if not application:
         return jsonify({'error': 'Application not found'}), 404
 
+    action = data.get('action')
     status = data.get('status')
     admin_note = data.get('admin_note')
+    review_group_info = data.get('review_group_info')
+    result_email_links = data.get('result_email_links')
+    result_email_image_url = data.get('result_email_image_url')
     allowed_statuses = {'pending', 'reviewing', 'processed', 'archived'}
 
-    if status is not None:
-        status = str(status).strip().lower()
-        if status not in allowed_statuses:
-            return jsonify({'error': 'Invalid application status'}), 400
-        application.status = status
-        application.processed_at = None if status == 'pending' else datetime.utcnow()
-
-    if admin_note is not None:
-        application.admin_note = str(admin_note).strip() or None
-
     try:
+        email_error = ''
+        feishu_error = ''
+        dirty_feishu = False
+
+        if action is not None:
+            _, mail_kind = apply_application_action(application, action, {
+                'admin_note': admin_note,
+                'review_group_info': review_group_info,
+                'result_email_links': result_email_links,
+                'result_email_image_url': result_email_image_url
+            })
+            db.session.commit()
+
+            if mail_kind:
+                _, email_error = send_status_email(application, mail_kind)
+
+            feishu_sent, feishu_error = send_status_update_card(application)
+            application.feishu_sent = feishu_sent
+            application.feishu_error = feishu_error or None
+        else:
+            if status is not None:
+                status = str(status).strip().lower()
+                if status not in allowed_statuses:
+                    return jsonify({'error': 'Invalid application status'}), 400
+                application.status = status
+                application.processed_at = None if status == 'pending' else datetime.utcnow()
+                dirty_feishu = True
+
+            if admin_note is not None:
+                application.admin_note = str(admin_note).strip() or None
+                dirty_feishu = True
+
+            if review_group_info is not None:
+                application.review_group_info = str(review_group_info).strip() or None
+                dirty_feishu = True
+
+            if result_email_links is not None:
+                application.result_email_links = str(result_email_links).strip() or None
+
+            if result_email_image_url is not None:
+                application.result_email_image_url = str(result_email_image_url).strip() or None
+
         db.session.commit()
-        return jsonify({
+
+        if action is None and dirty_feishu:
+            if (application.feishu_delivery_mode or '') == 'app' and application.feishu_message_id:
+                feishu_sent, feishu_error = send_status_update_card(application)
+                application.feishu_sent = feishu_sent
+                application.feishu_error = feishu_error or None
+                db.session.commit()
+
+        response = {
             'success': True,
             'message': '报名记录已更新',
             'application': application.to_dict()
-        })
+        }
+        if email_error:
+            response['email_warning'] = email_error
+        if feishu_error:
+            response['feishu_warning'] = feishu_error
+        return jsonify(response)
+    except ValueError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/applications/<int:application_id>', methods=['DELETE'])
+@jwt_required()
+def delete_application(application_id):
+    """删除报名记录"""
+    application = Application.query.get(application_id)
+    if not application:
+        return jsonify({'error': 'Application not found'}), 404
+
+    try:
+        db.session.delete(application)
+        db.session.commit()
+        return jsonify({'success': True, 'message': '报名记录已删除'})
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
@@ -329,7 +399,7 @@ def upload_image():
 
     try:
         file.save(file_path)
-        file_url = f"{request.host_url.rstrip('/')}/uploads/{filename}"
+        file_url = f"/uploads/{filename}"
         return jsonify({
             'success': True,
             'message': '图片上传成功',

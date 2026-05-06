@@ -40,29 +40,94 @@
         <div v-for="(project, index) in content.projects" :key="index" class="project-card">
           <div class="card-header">
             <span>{{ project.name || `项目 ${index + 1}` }}</span>
-            <button class="remove-btn small" @click="removeProject(index)">×</button>
+            <div class="card-header-actions">
+              <span v-if="project.status === 'wip'" class="status-badge wip">开发中</span>
+              <span v-else-if="project.status === 'archived'" class="status-badge archived">已归档</span>
+              <span v-if="project.featured" class="status-badge featured">精选</span>
+              <button class="remove-btn small" @click="removeProject(index)">×</button>
+            </div>
           </div>
-          
+
           <div class="form-row">
-            <input v-model="project.name" placeholder="项目名称" @input="emitUpdate" />
-            <select v-model="project.category" @change="emitUpdate">
-              <option value="">选择分类</option>
-              <option v-for="cat in content.filters" :key="cat" :value="cat">{{ cat }}</option>
-            </select>
+            <div class="sub-field">
+              <label>项目名称</label>
+              <input v-model="project.name" placeholder="项目名称" @input="onNameChange(index, $event.target.value)" />
+            </div>
+            <div class="sub-field">
+              <label>URL 标识 (slug)</label>
+              <input v-model="project.slug" placeholder="如: star-chart" @input="emitUpdate" />
+            </div>
           </div>
-          
-          <textarea v-model="project.description" placeholder="项目描述" rows="2" @input="emitUpdate"></textarea>
-          
+
           <div class="form-row">
-            <input v-model="project.link" placeholder="链接" @input="emitUpdate" />
-            <select v-model="project.coverClass" @change="emitUpdate">
-              <option value="aurora">Aurora 渐变</option>
-              <option value="meteor">Meteor 渐变</option>
-              <option value="nebula">Nebula 渐变</option>
-              <option value="cosmos">Cosmos 渐变</option>
-              <option value="pulse">Pulse 渐变</option>
-              <option value="horizon">Horizon 渐变</option>
-            </select>
+            <div class="sub-field">
+              <label>分类</label>
+              <select v-model="project.category" @change="emitUpdate">
+                <option value="">选择分类</option>
+                <option v-for="cat in content.filters" :key="cat" :value="cat">{{ cat }}</option>
+              </select>
+            </div>
+            <div class="sub-field">
+              <label>状态</label>
+              <select v-model="project.status" @change="emitUpdate">
+                <option value="active">进行中</option>
+                <option value="wip">开发中</option>
+                <option value="archived">已归档</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="sub-field">
+            <label>简短描述</label>
+            <textarea v-model="project.description" placeholder="卡片上显示的简短描述" rows="2" @input="emitUpdate"></textarea>
+          </div>
+
+          <div class="sub-field">
+            <label>详细介绍</label>
+            <textarea v-model="project.longDescription" placeholder="详情页显示的完整介绍，支持换行分段" rows="4" @input="emitUpdate"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="sub-field">
+              <label>内部链接</label>
+              <input v-model="project.link" placeholder="/onboarding" @input="emitUpdate" />
+            </div>
+            <div class="sub-field">
+              <label>开始时间</label>
+              <input v-model="project.startDate" placeholder="2024-09" @input="emitUpdate" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="sub-field">
+              <label>GitHub 链接</label>
+              <input v-model="project.githubUrl" placeholder="https://github.com/..." @input="emitUpdate" />
+            </div>
+            <div class="sub-field">
+              <label>在线演示</label>
+              <input v-model="project.demoUrl" placeholder="https://..." @input="emitUpdate" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="sub-field">
+              <label>封面样式</label>
+              <select v-model="project.coverClass" @change="emitUpdate">
+                <option value="aurora">Aurora 渐变</option>
+                <option value="meteor">Meteor 渐变</option>
+                <option value="nebula">Nebula 渐变</option>
+                <option value="cosmos">Cosmos 渐变</option>
+                <option value="pulse">Pulse 渐变</option>
+                <option value="horizon">Horizon 渐变</option>
+              </select>
+            </div>
+            <div class="sub-field">
+              <label>精选项目</label>
+              <label class="toggle-label">
+                <input type="checkbox" v-model="project.featured" @change="emitUpdate" />
+                <span class="toggle-text">{{ project.featured ? '是' : '否' }}</span>
+              </label>
+            </div>
           </div>
 
           <ImageUploadField
@@ -71,14 +136,69 @@
             hint="上传后将优先显示图片，未上传时继续使用渐变封面"
             @update:model-value="emitUpdate"
           />
-          
+
+          <div class="sub-field">
+            <label>技术栈（逗号分隔）</label>
+            <input
+              :value="project.techStack?.join(', ')"
+              @input="updateTechStack(index, $event.target.value)"
+              placeholder="Vue 3, Flask, MySQL"
+            />
+          </div>
+
           <div class="sub-field">
             <label>标签（逗号分隔）</label>
-            <input 
-              :value="project.tags?.join(', ')" 
+            <input
+              :value="project.tags?.join(', ')"
               @input="updateTags(index, $event.target.value)"
               placeholder="Vue, React, Python"
             />
+          </div>
+
+          <!-- Contributors -->
+          <div class="sub-field">
+            <label>贡献成员</label>
+            <div class="contributors-editor">
+              <div v-for="(contributor, cIndex) in project.contributors" :key="cIndex" class="contributor-row">
+                <div class="contributor-avatar-inline" :title="contributor.avatar ? '已匹配头像' : '未匹配头像'">
+                  <img v-if="contributor.avatar" :src="contributor.avatar" :alt="contributor.name" />
+                  <span v-else>{{ contributor.name?.charAt(0) || '?' }}</span>
+                </div>
+                <input
+                  class="contributor-name-input"
+                  :value="contributor.name"
+                  placeholder="姓名"
+                  @input="onContributorNameChange(index, cIndex, $event.target.value)"
+                />
+                <input
+                  class="contributor-role-input"
+                  v-model="contributor.role"
+                  placeholder="角色"
+                  @input="emitUpdate"
+                />
+                <button type="button" class="remove-btn small" @click.stop="removeContributor(index, cIndex)">×</button>
+              </div>
+              <button class="add-btn tiny" @click="addContributor(index)">+ 添加成员</button>
+            </div>
+          </div>
+
+          <!-- Screenshots -->
+          <div class="sub-field">
+            <label>项目截图</label>
+            <div class="screenshots-editor">
+              <div v-for="(shot, sIndex) in project.screenshots" :key="sIndex" class="screenshot-row">
+                <div class="screenshot-upload-wrapper">
+                  <ImageUploadField
+                    :model-value="project.screenshots[sIndex]"
+                    :label="`截图 ${sIndex + 1}`"
+                    hint="支持上传或填写 URL"
+                    @update:model-value="updateScreenshot(index, sIndex, $event)"
+                  />
+                </div>
+                <button class="remove-btn small" @click="removeScreenshot(index, sIndex)">×</button>
+              </div>
+              <button class="add-btn tiny" @click="addScreenshot(index)">+ 添加截图</button>
+            </div>
           </div>
         </div>
       </div>
@@ -123,6 +243,7 @@
 <script setup>
 import { reactive, ref, watch, onMounted } from 'vue'
 import ImageUploadField from '../ImageUploadField.vue'
+import { api } from '../../../services/api.js'
 
 const props = defineProps({
   modelValue: {
@@ -137,7 +258,7 @@ const newFilter = ref('')
 
 const defaultContent = {
   hero: { eyebrow: '', title: '', subtitle: '' },
-  filters: ['全部'],
+  filters: ['全部', '精选'],
   projects: [],
   cta: {
     title: '',
@@ -148,10 +269,27 @@ const defaultContent = {
 }
 
 const content = reactive({ ...defaultContent })
+const membersList = ref([])
 
 onMounted(() => {
   Object.assign(content, JSON.parse(JSON.stringify({ ...defaultContent, ...props.modelValue })))
+  loadMembers()
 })
+
+async function loadMembers() {
+  try {
+    const data = await api.getPage('members')
+    if (data?.members) {
+      membersList.value = data.members
+    }
+  } catch {}
+}
+
+function findMemberByName(name) {
+  if (!name?.trim()) return null
+  const trimmed = name.trim()
+  return membersList.value.find(m => m.name === trimmed) || null
+}
 
 watch(() => props.modelValue, (newVal) => {
   Object.assign(content, JSON.parse(JSON.stringify({ ...defaultContent, ...newVal })))
@@ -174,15 +312,44 @@ function removeFilter(index) {
   emitUpdate()
 }
 
+function slugify(text) {
+  return text
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, '-')
+    .replace(/[^\w一-鿿-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+function onNameChange(index, value) {
+  content.projects[index].name = value
+  if (!content.projects[index].slug) {
+    content.projects[index].slug = slugify(value)
+  }
+  emitUpdate()
+}
+
 function addProject() {
   content.projects.push({
     name: '',
+    slug: '',
     category: '',
     description: '',
+    longDescription: '',
     link: '',
     coverImage: '',
     coverClass: 'aurora',
-    tags: []
+    tags: [],
+    techStack: [],
+    contributors: [],
+    screenshots: [],
+    githubUrl: '',
+    demoUrl: '',
+    status: 'active',
+    featured: false,
+    startDate: ''
   })
   emitUpdate()
 }
@@ -194,6 +361,52 @@ function removeProject(index) {
 
 function updateTags(index, value) {
   content.projects[index].tags = value.split(',').map(s => s.trim()).filter(Boolean)
+  emitUpdate()
+}
+
+function updateTechStack(index, value) {
+  content.projects[index].techStack = value.split(',').map(s => s.trim()).filter(Boolean)
+  emitUpdate()
+}
+
+function addContributor(projectIndex) {
+  if (!content.projects[projectIndex].contributors) {
+    content.projects[projectIndex].contributors = []
+  }
+  content.projects[projectIndex].contributors.push({ name: '', role: '', avatar: '' })
+  emitUpdate()
+}
+
+function removeContributor(projectIndex, contributorIndex) {
+  content.projects[projectIndex].contributors.splice(contributorIndex, 1)
+  emitUpdate()
+}
+
+function onContributorNameChange(projectIndex, contributorIndex, value) {
+  const contributor = content.projects[projectIndex].contributors[contributorIndex]
+  contributor.name = value
+  const member = findMemberByName(value)
+  if (member?.avatar) {
+    contributor.avatar = member.avatar
+  }
+  emitUpdate()
+}
+
+function addScreenshot(projectIndex) {
+  if (!content.projects[projectIndex].screenshots) {
+    content.projects[projectIndex].screenshots = []
+  }
+  content.projects[projectIndex].screenshots.push('')
+  emitUpdate()
+}
+
+function updateScreenshot(projectIndex, screenshotIndex, value) {
+  content.projects[projectIndex].screenshots[screenshotIndex] = value
+  emitUpdate()
+}
+
+function removeScreenshot(projectIndex, screenshotIndex) {
+  content.projects[projectIndex].screenshots.splice(screenshotIndex, 1)
   emitUpdate()
 }
 </script>
@@ -334,10 +547,38 @@ function updateTags(index, value) {
   align-items: center;
 }
 
-.card-header span {
+.card-header > span {
   font-size: 14px;
   font-weight: 600;
   color: var(--primary);
+}
+
+.card-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.status-badge.wip {
+  background: rgba(255, 183, 77, 0.15);
+  color: #ffb74d;
+}
+
+.status-badge.archived {
+  background: rgba(158, 158, 158, 0.15);
+  color: #9e9e9e;
+}
+
+.status-badge.featured {
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
 }
 
 .project-card input,
@@ -382,6 +623,107 @@ function updateTags(index, value) {
 .add-btn:hover {
   border-color: var(--primary);
   color: var(--primary);
+}
+
+.add-btn.tiny {
+  padding: 6px 12px;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 10px 0;
+}
+
+.toggle-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.toggle-text {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.contributors-editor,
+.screenshots-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contributor-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.contributor-avatar-inline {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: grid;
+  place-items: center;
+}
+
+.contributor-avatar-inline img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.contributor-avatar-inline span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #04101f;
+  line-height: 1;
+}
+
+.contributor-name-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.contributor-role-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.contributor-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.contributor-row input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.screenshot-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.screenshot-upload-wrapper {
+  flex: 1;
+  min-width: 0;
 }
 
 .remove-btn {

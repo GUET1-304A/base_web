@@ -64,6 +64,19 @@
           </div>
           
           <div class="sub-field">
+            <label>参与项目</label>
+            <div class="projects-editor">
+              <div v-for="(proj, pIndex) in member.projects" :key="pIndex" class="project-row">
+                <input v-model="proj.name" placeholder="项目名" @input="emitUpdate" />
+                <input v-model="proj.slug" placeholder="slug" @input="emitUpdate" />
+                <input v-model="proj.role" placeholder="担任角色" @input="emitUpdate" />
+                <button class="remove-btn small" @click="removeMemberProject(index, pIndex)">×</button>
+              </div>
+              <button class="add-btn tiny" @click="addMemberProject(index)">+ 添加项目</button>
+            </div>
+          </div>
+
+          <div class="sub-field">
             <label>链接</label>
             <div class="links-row">
               <input v-model="member.links.github" placeholder="GitHub" @input="emitUpdate" />
@@ -154,7 +167,8 @@ function addMember() {
     avatar: '',
     description: '',
     skills: [],
-    links: { github: '', portfolio: '' }
+    links: { github: '', portfolio: '' },
+    projects: []
   })
   emitUpdate()
 }
@@ -166,6 +180,19 @@ function removeMember(index) {
 
 function updateSkills(index, value) {
   content.members[index].skills = value.split(',').map(s => s.trim()).filter(Boolean)
+  emitUpdate()
+}
+
+function addMemberProject(memberIndex) {
+  if (!content.members[memberIndex].projects) {
+    content.members[memberIndex].projects = []
+  }
+  content.members[memberIndex].projects.push({ name: '', slug: '', role: '' })
+  emitUpdate()
+}
+
+function removeMemberProject(memberIndex, projectIndex) {
+  content.members[memberIndex].projects.splice(projectIndex, 1)
   emitUpdate()
 }
 </script>
@@ -340,6 +367,34 @@ function updateSkills(index, value) {
   gap: 8px;
 }
 
+.projects-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.project-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.project-row input {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  font-size: 12px;
+  min-width: 0;
+}
+
+.project-row input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
 .add-btn {
   padding: 10px 20px;
   border: 1px dashed var(--panel-border);
@@ -354,6 +409,13 @@ function updateSkills(index, value) {
 .add-btn:hover {
   border-color: var(--primary);
   color: var(--primary);
+}
+
+.add-btn.tiny {
+  padding: 5px 10px;
+  font-size: 11px;
+  margin-top: 4px;
+  align-self: flex-start;
 }
 
 .remove-btn {
