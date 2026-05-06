@@ -59,9 +59,21 @@ class Application(db.Model):
     ip_address = db.Column(db.String(64), nullable=True)
     status = db.Column(db.String(20), nullable=False, default='pending')
     admin_note = db.Column(db.Text, nullable=True)
+    action_token = db.Column(db.String(64), nullable=True, unique=True)
+    result_type = db.Column(db.String(20), nullable=True)
+    review_group_info = db.Column(db.Text, nullable=True)
+    result_email_links = db.Column(db.Text, nullable=True)
+    result_email_image_url = db.Column(db.String(255), nullable=True)
     processed_at = db.Column(db.DateTime, nullable=True)
     feishu_sent = db.Column(db.Boolean, default=False, nullable=False)
     feishu_error = db.Column(db.Text, nullable=True)
+    feishu_message_id = db.Column(db.String(120), nullable=True)
+    feishu_open_message_id = db.Column(db.String(120), nullable=True)
+    feishu_delivery_mode = db.Column(db.String(20), nullable=True)
+    last_email_type = db.Column(db.String(30), nullable=True)
+    last_email_sent = db.Column(db.Boolean, default=False, nullable=False)
+    last_email_error = db.Column(db.Text, nullable=True)
+    last_email_sent_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -81,9 +93,21 @@ class Application(db.Model):
             'ip_address': self.ip_address,
             'status': self.status,
             'admin_note': self.admin_note,
+            'action_token': self.action_token,
+            'result_type': self.result_type,
+            'review_group_info': self.review_group_info,
+            'result_email_links': self.result_email_links,
+            'result_email_image_url': self.result_email_image_url,
             'processed_at': self.processed_at.isoformat() if self.processed_at else None,
             'feishu_sent': self.feishu_sent,
             'feishu_error': self.feishu_error,
+            'feishu_message_id': self.feishu_message_id,
+            'feishu_open_message_id': self.feishu_open_message_id,
+            'feishu_delivery_mode': self.feishu_delivery_mode,
+            'last_email_type': self.last_email_type,
+            'last_email_sent': self.last_email_sent,
+            'last_email_error': self.last_email_error,
+            'last_email_sent_at': self.last_email_sent_at.isoformat() if self.last_email_sent_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 

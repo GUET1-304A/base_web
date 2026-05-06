@@ -8,8 +8,8 @@ export const defaultSiteConfig = {
       { value: '12+', label: '协作项目' },
       { value: '100%', label: '鼓励开源' },
       { value: '5+', label: '参与开源社区' },
-      { value: 'TRAE', label: '合作社区' },
-      { value: 'NULL', label: '参与比赛' }
+      { value: '3+', label: '合作社区' },
+      { value: '2+', label: '参与比赛' }
     ],
     signalCard: {
       eyebrow: '协作 · 创造 · 分享',
@@ -79,23 +79,31 @@ export const defaultSiteConfig = {
           {
             category: '网站平台',
             name: '星图导航',
+            slug: 'star-chart',
             description: '为新成员与访客整理社团资讯、活动日历与学习路线的门户网站。',
             link: '/onboarding',
-            coverClass: 'aurora'
+            coverClass: 'aurora',
+            featured: true,
+            techStack: ['Vue 3', 'Tailwind CSS', 'Flask']
           },
           {
             category: '效率工具',
             name: '雨记协作板',
+            slug: 'rain-note',
             description: '支持任务拆分、进度同步与复盘记录的轻量化协作工具。',
             link: '/yuji',
-            coverClass: 'meteor'
+            coverClass: 'meteor',
+            featured: true,
+            techStack: ['Vue 3', 'Rust', 'WebSocket']
           },
           {
             category: '品牌内容',
             name: '星雨年刊',
+            slug: 'xingyu-annual',
             description: '沉淀年度作品、社团故事和成员成长轨迹的数字刊物与视觉专题。',
             link: '/timeline',
-            coverClass: 'nebula'
+            coverClass: 'nebula',
+            techStack: ['设计', '内容策划']
           }
         ]
       },
@@ -108,16 +116,21 @@ export const defaultSiteConfig = {
           {
             category: '网站平台',
             name: '星图导航',
+            slug: 'star-chart',
             description: '为新成员与访客整理社团资讯、活动日历与学习路线的门户网站。',
             link: '/onboarding',
-            coverClass: 'aurora'
+            coverClass: 'aurora',
+            featured: true,
+            techStack: ['Vue 3', 'Tailwind CSS', 'Flask']
           },
           {
             category: '网站平台',
             name: '活动报名系统',
+            slug: 'event-system',
             description: '用于活动预告、报名管理和数据统计，帮助组织流程更顺畅。',
             link: '',
-            coverClass: 'cosmos'
+            coverClass: 'cosmos',
+            techStack: ['Vue 3', 'Flask']
           }
         ]
       },
@@ -130,16 +143,21 @@ export const defaultSiteConfig = {
           {
             category: '效率工具',
             name: '雨记协作板',
+            slug: 'rain-note',
             description: '支持任务拆分、进度同步与复盘记录的轻量化协作工具。',
             link: '/yuji',
-            coverClass: 'meteor'
+            coverClass: 'meteor',
+            featured: true,
+            techStack: ['Vue 3', 'Rust', 'WebSocket']
           },
           {
             category: '效率工具',
             name: '灵感收集箱',
+            slug: 'idea-box',
             description: '面向社团成员的灵感归档空间，方便记录选题、链接和碎片创意。',
             link: '',
-            coverClass: 'pulse'
+            coverClass: 'pulse',
+            techStack: ['Vue 3']
           }
         ]
       },
@@ -152,16 +170,20 @@ export const defaultSiteConfig = {
           {
             category: '品牌内容',
             name: '星雨年刊',
+            slug: 'xingyu-annual',
             description: '沉淀年度作品、社团故事和成员成长轨迹的数字刊物与视觉专题。',
             link: '/timeline',
-            coverClass: 'nebula'
+            coverClass: 'nebula',
+            techStack: ['设计', '内容策划']
           },
           {
             category: '品牌内容',
             name: '开放分享计划',
+            slug: 'open-sharing',
             description: '将讲座回顾、教程文章和项目经验整理成公开可访问的内容合集。',
             link: '/blog',
-            coverClass: 'horizon'
+            coverClass: 'horizon',
+            techStack: ['内容', '社媒']
           }
         ]
       }
@@ -202,6 +224,8 @@ export const defaultSiteConfig = {
     slogan: '以协作连接灵感，以开源延续成长。'
   },
   system: {
-    feishuWebhookUrl: ''
+    feishuMode: 'app',
+    feishuWebhookUrl: 'https://open.feishu.cn/open-apis/bot/v2/hook/56414ab3-8973-4f85-8b4f-74d5ddba546b',
+    feishuAppChatId: ''
   }
 };

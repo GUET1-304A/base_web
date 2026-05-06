@@ -38,6 +38,12 @@ const router = createRouter({
       meta: { title: '项目展示 - 星雨作坊' }
     },
     {
+      path: '/project/:slug',
+      name: 'project-detail',
+      component: () => import('../views/ProjectDetailView.vue'),
+      meta: { title: '项目详情 - 星雨作坊' }
+    },
+    {
       path: '/blog',
       name: 'blog',
       component: () => import('../views/BlogView.vue'),
@@ -96,13 +102,8 @@ const router = createRouter({
   }
 })
 
-router.beforeEach((to, from, next) => {
-  if (to.meta.title) {
-    document.title = to.meta.title
-  } else {
-    document.title = '星雨作坊 - 把灵感变成作品'
-  }
-  next()
+router.beforeEach((to) => {
+  document.title = to.meta.title || '星雨作坊 - 把灵感变成作品'
 })
 
 export default router

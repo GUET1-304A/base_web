@@ -276,11 +276,12 @@ function showMessage(text, type = 'success') {
 async function loadConfig() {
   isLoading.value = true
   try {
-    siteConfig.value = await api.getSiteConfig()
-    if (!siteConfig.value.system) {
-      siteConfig.value.system = {
-        feishuWebhookUrl: ''
-      }
+    siteConfig.value = await api.getAdminConfig()
+    siteConfig.value.system = {
+      feishuMode: 'app',
+      feishuWebhookUrl: '',
+      feishuAppChatId: '',
+      ...(siteConfig.value.system || {})
     }
   } catch (e) {
     showMessage('加载配置失败', 'error')

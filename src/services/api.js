@@ -1,6 +1,6 @@
 import { defaultSiteConfig } from '../data/defaultConfig.js';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 const TOKEN_KEY = 'xingyu_admin_token';
 const SITE_PREVIEW_KEY = 'xingyu_site_preview';
 const PAGE_PREVIEW_KEY_PREFIX = 'xingyu_page_preview:';
@@ -186,6 +186,10 @@ export const api = {
     });
   },
 
+  async getAdminConfig() {
+    return normalizeLegacyData(await request('/admin/config'));
+  },
+
   async updateConfigSection(key, value) {
     return await request(`/admin/config/${key}`, {
       method: 'PUT',
@@ -242,6 +246,12 @@ export const api = {
     return await request(`/admin/applications/${applicationId}`, {
       method: 'PATCH',
       body: JSON.stringify(payload)
+    });
+  },
+
+  async deleteApplication(applicationId) {
+    return await request(`/admin/applications/${applicationId}`, {
+      method: 'DELETE'
     });
   },
 

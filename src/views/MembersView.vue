@@ -50,13 +50,27 @@
                 <span class="member-group">{{ member.group }}</span>
                 <p class="member-desc">{{ member.description }}</p>
                 <div class="member-skills">
-                  <span 
-                    v-for="(skill, sIndex) in member.skills" 
+                  <span
+                    v-for="(skill, sIndex) in member.skills"
                     :key="sIndex"
                     class="skill-tag"
                   >
                     {{ skill }}
                   </span>
+                </div>
+                <div v-if="member.projects?.length" class="member-projects">
+                  <span class="projects-label">参与项目</span>
+                  <div class="projects-list">
+                    <router-link
+                      v-for="(proj, pIndex) in member.projects"
+                      :key="pIndex"
+                      :to="proj.slug ? `/project/${proj.slug}` : '#'"
+                      class="project-chip"
+                    >
+                      <span class="project-chip-name">{{ proj.name }}</span>
+                      <span v-if="proj.role" class="project-chip-role">{{ proj.role }}</span>
+                    </router-link>
+                  </div>
                 </div>
                 <div class="member-links">
                   <a 
@@ -348,6 +362,54 @@ onMounted(async () => {
   border-radius: 999px;
   font-size: 12px;
   color: var(--text);
+}
+
+.member-projects {
+  margin-bottom: 16px;
+}
+
+.projects-label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.projects-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.project-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(121, 168, 255, 0.08);
+  border: 1px solid rgba(121, 168, 255, 0.15);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.project-chip:hover {
+  border-color: var(--primary);
+  background: rgba(121, 168, 255, 0.15);
+}
+
+.project-chip-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.project-chip-role {
+  font-size: 11px;
+  color: var(--muted);
+  padding-left: 6px;
+  border-left: 1px solid var(--panel-border);
 }
 
 .member-links {

@@ -20,9 +20,15 @@ class Config:
     MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD') or ''
     MYSQL_DATABASE = os.environ.get('MYSQL_DATABASE') or 'xingyu_cms'
     
-    SQLALCHEMY_DATABASE_URI = (
-        f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
-    )
+    # 支持 DATABASE_URL 环境变量覆盖，或设置 USE_SQLITE=true 使用 SQLite
+    if os.environ.get('DATABASE_URL'):
+        SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    elif _get_bool('USE_SQLITE', False):
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(BASE_DIR, 'xingyu_cms.db')}"
+    else:
+        SQLALCHEMY_DATABASE_URI = (
+            f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
+        )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'xingyu-jwt-secret-2026'
@@ -32,9 +38,28 @@ class Config:
     UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER') or os.path.join(BASE_DIR, 'uploads')
     MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH') or 10 * 1024 * 1024)
     FEISHU_WEBHOOK_URL = (os.environ.get('FEISHU_WEBHOOK_URL') or '').strip()
+    FEISHU_APP_ENABLED = _get_bool('FEISHU_APP_ENABLED', False)
+    FEISHU_APP_ID = (os.environ.get('FEISHU_APP_ID') or '').strip()
+    FEISHU_APP_SECRET = (os.environ.get('FEISHU_APP_SECRET') or '').strip()
+    FEISHU_APP_CHAT_ID = (os.environ.get('FEISHU_APP_CHAT_ID') or '').strip()
+    FEISHU_APP_VERIFICATION_TOKEN = (os.environ.get('FEISHU_APP_VERIFICATION_TOKEN') or '').strip()
+    FEISHU_APP_ENCRYPT_KEY = (os.environ.get('FEISHU_APP_ENCRYPT_KEY') or '').strip()
+    FEISHU_HTTP_TIMEOUT = float(os.environ.get('FEISHU_HTTP_TIMEOUT') or 8)
+    FEISHU_HTTP_RETRIES = int(os.environ.get('FEISHU_HTTP_RETRIES') or 0)
+    FEISHU_HTTP_RETRY_BACKOFF_SECONDS = float(os.environ.get('FEISHU_HTTP_RETRY_BACKOFF_SECONDS') or 0.6)
     APPLICATION_RATE_LIMIT_MINUTES = int(os.environ.get('APPLICATION_RATE_LIMIT_MINUTES') or 10)
     DEFAULT_GITHUB_URL = os.environ.get('DEFAULT_GITHUB_URL') or 'https://github.com/GUET1-304A'
-    DEFAULT_APPLICATION_GITHUB_URL = os.environ.get('DEFAULT_APPLICATION_GITHUB_URL') or 'https://github.com'
+    DEFAULT_APPLICATION_GITHUB_URL = os.environ.get('DEFAULT_APPLICATION_GITHUB_URL') or ''
+    APPLICATION_ACTION_BASE_URL = (os.environ.get('APPLICATION_ACTION_BASE_URL') or '').rstrip('/')
+    MAIL_ENABLED = _get_bool('MAIL_ENABLED', False)
+    SMTP_HOST = (os.environ.get('SMTP_SERVER') or os.environ.get('SMTP_HOST') or '').strip()
+    SMTP_PORT = int(os.environ.get('SMTP_PORT') or 587)
+    SMTP_USERNAME = (os.environ.get('SMTP_USER') or os.environ.get('SMTP_USERNAME') or '').strip()
+    SMTP_PASSWORD = (os.environ.get('SMTP_PASSWORD') or '').strip()
+    SMTP_USE_TLS = _get_bool('SMTP_USE_TLS', True)
+    SMTP_USE_SSL = _get_bool('SMTP_USE_SSL', False)
+    MAIL_FROM_NAME = (os.environ.get('MAIL_FROM_NAME') or '星雨作坊').strip()
+    MAIL_FROM_EMAIL = (os.environ.get('SMTP_FROM') or os.environ.get('MAIL_FROM_EMAIL') or SMTP_USERNAME).strip()
     APP_HOST = os.environ.get('APP_HOST') or '0.0.0.0'
     APP_PORT = int(os.environ.get('APP_PORT') or 5000)
     APP_DEBUG = _get_bool('APP_DEBUG', True)

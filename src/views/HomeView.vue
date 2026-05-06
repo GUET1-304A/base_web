@@ -117,90 +117,54 @@
       <section class="section flip-section" id="products" data-reveal-section>
         <div class="section-heading flip-heading">
           <p class="eyebrow">PROJECTS</p>
-          <h2>{{ siteConfig.products?.title || '产品展示' }}</h2>
-          <p>{{ siteConfig.products?.description || '' }}</p>
-        </div>
-
-        <div class="product-tabs flip-toolbar" role="tablist" aria-label="产品分类">
-          <button 
-            v-for="(category, index) in (siteConfig.products?.categories || [])"
-            :key="index"
-            :class="['tab-button', { active: activeProductSlide === index }]" 
-            type="button" 
-            @click="setProductSlide(index)"
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              flex-wrap: wrap;
+              gap: 1rem;
+              margin-bottom: 1rem;
+            "
           >
-            {{ category }}
-          </button>
+            <h2>{{ siteConfig.products?.title || '产品展示' }}</h2>
+            <a class="button button-secondary" href="/projects" style="padding: 8px 16px; font-size: 14px"
+              >查看全部</a
+            >
+          </div>
+          <p style="margin-top: 0">{{ siteConfig.products?.description || '' }}</p>
         </div>
 
-        <div class="product-stage flip-card" style="--delay: 0.18s; --tilt: 4deg">
-          <div class="product-stage-head">
-            <div class="product-stage-caption">
-              <p class="eyebrow">SLIDE MODE</p>
-              <h3>像翻阅作品集一样查看项目章节</h3>
+        <!-- 精选项目 -->
+        <div class="featured-row">
+          <component
+            v-for="(project, index) in featuredProjects"
+            :key="project.slug || index"
+            :is="project.slug ? 'router-link' : (project.link ? 'a' : 'article')"
+            class="featured-card flip-card"
+            :style="`--delay: ${0.08 + index * 0.1}s`"
+            :to="project.slug ? `/project/${project.slug}` : undefined"
+            :href="!project.slug ? (project.link || undefined) : undefined"
+          >
+            <div :class="['featured-cover', project.coverClass || 'aurora']">
+              <img
+                v-if="project.coverImage"
+                :src="project.coverImage"
+                :alt="project.name"
+                class="featured-cover-image"
+              />
+              <div class="featured-cover-overlay"></div>
+              <span class="featured-badge">精选</span>
             </div>
-            <div class="product-nav">
-              <button class="carousel-button" type="button" aria-label="上一页" @click="prevProductSlide">←</button>
-              <button class="carousel-button" type="button" aria-label="下一页" @click="nextProductSlide">→</button>
+            <div class="featured-body">
+              <span class="featured-category">{{ project.category }}</span>
+              <h3>{{ project.name }}</h3>
+              <p>{{ project.description }}</p>
+              <div v-if="project.techStack?.length" class="featured-tech">
+                <span v-for="(tech, tIndex) in project.techStack.slice(0, 4)" :key="tIndex">{{ tech }}</span>
+              </div>
             </div>
-          </div>
-
-          <div class="product-slider">
-            <div class="product-track">
-              <article 
-                v-for="(slide, sIndex) in (siteConfig.products?.slides || [])"
-                :key="sIndex"
-                :class="['product-slide', { 'is-active': activeProductSlide === sIndex }]" 
-                :data-slide-index="sIndex"
-              >
-                <div class="product-story panel">
-                  <span class="product-story-tag">{{ slide.tag }}</span>
-                  <h3>{{ slide.title }}</h3>
-                  <p>{{ slide.description }}</p>
-                  <ul v-if="slide.metrics?.length" class="product-story-metrics">
-                    <li v-for="(metric, mIndex) in slide.metrics" :key="mIndex">
-                      <strong>{{ metric.value }}</strong>
-                      <span>{{ metric.label }}</span>
-                    </li>
-                  </ul>
-                </div>
-                <div :class="['product-page-grid', { 'product-page-grid-trio': slide.projects?.length >= 3 }]">
-                  <component 
-                    v-for="(project, pIndex) in slide.projects" 
-                    :key="pIndex"
-                    :is="project.link ? 'a' : 'article'"
-                    class="product-card" 
-                    :href="project.link || undefined"
-                  >
-                    <div :class="['product-cover', project.coverClass || 'aurora']">
-                      <img
-                        v-if="project.coverImage"
-                        :src="project.coverImage"
-                        :alt="project.name"
-                        class="product-cover-image"
-                      />
-                    </div>
-                    <div class="product-body">
-                      <span>{{ project.category }}</span>
-                      <h3>{{ project.name }}</h3>
-                      <p>{{ project.description }}</p>
-                    </div>
-                  </component>
-                </div>
-              </article>
-            </div>
-          </div>
-
-          <div class="product-dots" aria-label="产品章节分页">
-            <button
-              v-for="(_, index) in (siteConfig.products?.slides || [])"
-              :key="index"
-              :class="['product-dot', { 'is-active': activeProductSlide === index }]"
-              type="button"
-              :aria-label="`切换到第 ${index + 1} 个章节`"
-              @click="setProductSlide(index)"
-            ></button>
-          </div>
+          </component>
         </div>
       </section>
 
@@ -266,7 +230,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
+import gsap from 'gsap'
+import ScrollTrigger from 'gsap/ScrollTrigger'
 import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue'
 import { useGsapAnimations } from '../composables/useGsapAnimations.js'
@@ -274,23 +240,11 @@ import { defaultSiteConfig } from '../data/defaultConfig.js'
 import { api } from '../services/api.js'
 
 const siteConfig = ref(defaultSiteConfig)
-const activeProductSlide = ref(0)
+const projectsData = ref([])
 
-const slidesCount = computed(() => siteConfig.value.products?.slides?.length || 4)
-
-const setProductSlide = (index) => {
-  const count = slidesCount.value
-  const normalized = ((index % count) + count) % count
-  activeProductSlide.value = normalized
-}
-
-const nextProductSlide = () => {
-  setProductSlide(activeProductSlide.value + 1)
-}
-
-const prevProductSlide = () => {
-  setProductSlide(activeProductSlide.value - 1)
-}
+const featuredProjects = computed(() =>
+  projectsData.value.filter(p => p.featured)
+)
 
 const aboutCardStyle = (index) => {
   const delays = [0.06, 0.16, 0.26]
@@ -321,4 +275,176 @@ useGsapAnimations()
 api.getSiteConfig().then((config) => {
   if (config) siteConfig.value = config
 })
+
+api.getPage('projects').then((data) => {
+  if (data?.projects) projectsData.value = data.projects
+  nextTick(() => {
+    gsap.registerPlugin(ScrollTrigger)
+    const section = document.querySelector('#products')
+    if (!section) return
+    const cards = section.querySelectorAll('.featured-card')
+    cards.forEach((card, index) => {
+      gsap.fromTo(card,
+        { yPercent: 18, opacity: 0, rotateX: 26, filter: 'blur(12px)', transformOrigin: '50% 0' },
+        { yPercent: 0, opacity: 1, rotateX: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out', delay: 0.15 + index * 0.1 }
+      )
+    })
+  })
+})
 </script>
+
+<style scoped>
+/* ===== 精选项目横排 ===== */
+.featured-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.featured-card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(11, 26, 46, 0.6);
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: all 0.35s ease;
+}
+
+.featured-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+}
+
+.featured-cover {
+  position: relative;
+  min-height: 220px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.featured-cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.featured-cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(5, 14, 28, 0.85) 0%, transparent 60%);
+}
+
+.featured-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  padding: 5px 14px;
+  background: rgba(255, 215, 0, 0.9);
+  color: #1a1a1a;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.featured-cover.aurora {
+  background: linear-gradient(135deg, #4a90e2 0%, #67b26f 100%);
+}
+
+.featured-cover.meteor {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.featured-cover.nebula {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.featured-cover.cosmos {
+  background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+}
+
+.featured-cover.pulse {
+  background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+}
+
+.featured-cover.horizon {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.featured-body {
+  padding: 22px 24px 26px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.featured-category {
+  display: inline-block;
+  width: fit-content;
+  padding: 4px 12px;
+  background: rgba(121, 168, 255, 0.12);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.featured-body h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+
+.featured-body p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  flex: 1;
+  margin: 0;
+}
+
+.featured-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.featured-tech span {
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 1080px) {
+  .featured-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .featured-row {
+    gap: 16px;
+  }
+
+  .featured-cover {
+    min-height: 180px;
+  }
+
+  .featured-body h3 {
+    font-size: 20px;
+  }
+}
+</style>
