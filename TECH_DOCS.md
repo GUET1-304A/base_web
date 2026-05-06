@@ -1176,13 +1176,122 @@ server {
 | `SECRET_KEY` / `JWT_SECRET_KEY` | 勿使用仓库默认值                                                         |
 
 
-### 5. 仅静态托管（不推荐）
+### 5. Docker Compose 一键部署（推荐）
+
+项目提供了完整的 Docker Compose 配置，包含三个容器：**MySQL**、**Flask 后端**、**Nginx 前端**。
+
+#### 前置条件
+
+- 服务器已安装 Docker 与 Docker Compose
+- 已构建前端（`npm run build` 生成 `dist/`）
+
+#### 部署步骤
+
+```bash
+# 1. 将项目复制到服务器
+scp -r . user@server:/path/to/base_web
+
+# 2. 进入项目目录
+cd /path/to/base_web
+
+# 3. 复制环境变量模板并编辑
+cp .env.docker .env
+vim .env   # 修改下方关键配置
+```
+
+#### `.env` 关键配置
+
+```env
+# 必须修改
+SECRET_KEY=随机字符串
+JWT_SECRET_KEY=另一个随机字符串
+CORS_ORIGINS=https://your-domain.com
+APPLICATION_ACTION_BASE_URL=https://your-domain.com
+
+# 数据库（默认即可，或修改密码）
+MYSQL_ROOT_PASSWORD=xingyu_mysql_2026
+
+# 服务端口
+APP_PORT=80
+
+# 飞书/邮件按需配置
+FEISHU_WEBHOOK_URL=...
+MAIL_ENABLED=true
+SMTP_SERVER=smtp.qq.com
+...
+```
+
+#### 启动服务
+
+```bash
+# 构建前端
+npm install
+npm run build
+
+# 启动所有容器（首次会拉取镜像 + 构建后端）
+docker-compose up -d --build
+
+# 查看日志
+docker-compose logs -f
+
+# 停止服务
+docker-compose down
+
+# 停止并删除数据卷（慎用，会丢失数据库和上传文件）
+docker-compose down -v
+```
+
+#### 容器说明
+
+| 服务       | 镜像            | 端口   | 说明                           |
+| ---------- | --------------- | ------ | ------------------------------ |
+| `db`       | mysql:8.0       | 3306   | MySQL 数据库，数据持久化到 `mysql_data` 卷 |
+| `backend`  | 自定义 (Flask)  | 5000   | Flask API，上传文件持久化到 `uploads_data` 卷 |
+| `frontend` | nginx:alpine    | 80     | Nginx 托管 `dist/`，反代 `/api` 和 `/uploads` 到后端 |
+
+#### 数据持久化
+
+- **数据库**：`mysql_data` 卷 → 容器内 `/var/lib/mysql`
+- **上传文件**：`uploads_data` 卷 → 容器内 `/app/uploads`
+
+`docker-compose down` 不加 `-v` 参数时数据不会丢失。
+
+#### 首次部署后
+
+访问 `http://服务器IP/admin`，使用默认账号登录：
+
+- 用户名：`admin`
+- 密码：`admin123`
+
+**请立即修改默认密码。**
+
+#### 常见问题
+
+| 现象 | 排查 |
+|------|------|
+| 后端启动失败 | `docker-compose logs backend` 查看日志，检查 `.env` 配置 |
+| 数据库连接失败 | 确认 `db` 容器健康检查通过：`docker-compose ps` |
+| 图片上传后无法显示 | 检查 `uploads_data` 卷是否正常挂载 |
+| 飞书回调失败 | 确认 `APPLICATION_ACTION_BASE_URL` 为公网可达地址，且飞书开放平台已配置回调 URL |
+
+### 6. 仅静态托管（不推荐）
 
 若前端托管在纯静态平台且 API 在另一域名，需配置 **CORS** 与 **VITE_API_BASE** 指向 API 域名；飞书回调与 `APPLICATION_ACTION_BASE_URL` 仍须指向 **API 可达的公网地址**。
 
 ---
 
 ## 版本记录
+
+### v3.2.0 (2026-05-06)
+
+- 新增 Docker Compose 一键部署方案（MySQL + Flask + Nginx）
+- 新增项目详情页 `/project/:slug`，支持截图、技术栈、贡献成员展示
+- 首页产品展示改为精选项目卡片，数据统一来自 projects 页面
+- 管理后台截图编辑器支持文件上传（ImageUploadField）
+- 贡献者添加时自动匹配社团成员头像
+- 上传接口改为返回相对路径，修复跨环境图片加载问题
+- 导航栏补全成员、作品、博客入口
+- 成员页增加参与项目关联展示
 
 ### v3.1.0 (2026-04-07)
 
@@ -1244,8 +1353,8 @@ server {
 
 ## 文档信息
 
-- 文档版本：3.1.0
-- 最后更新：2026-04-07
+- 文档版本：3.2.0
+- 最后更新：2026-05-06
 - 项目名称：星雨作坊官网 CMS (base_web)
 - 分支：vue版本
 
