@@ -1,12 +1,13 @@
 import os
+import secrets
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from sqlalchemy import inspect, text
 
 from config import config
-from defaults import DEFAULT_APPLICATION_GITHUB_URL, DEFAULT_GITHUB_URL
-from models import db, Page
+from defaults import DEFAULT_GITHUB_URL
+from models import db, Page, Application
 
 
 def ensure_application_schema():
@@ -29,11 +30,67 @@ def ensure_application_schema():
         migration_sql.append(
             "ALTER TABLE applications ADD COLUMN processed_at DATETIME NULL"
         )
+    if 'action_token' not in columns:
+        migration_sql.append(
+            "ALTER TABLE applications ADD COLUMN action_token VARCHAR(64) NULL"
+        )
+    if 'result_type' not in columns:
+        migration_sql.append(
+            "ALTER TABLE applications ADD COLUMN result_type VARCHAR(20) NULL"
+        )
+    if 'review_group_info' not in columns:
+        migration_sql.append(
+            "ALTER TABLE applications ADD COLUMN review_group_info TEXT NULL"
+        )
+    if 'result_email_links' not in columns:
+        migration_sql.append(
+            "ALTER TABLE applications ADD COLUMN result_email_links TEXT NULL"
+        )
+    if 'result_email_image_url' not in columns:
+        migration_sql.append(
+            "ALTER TABLE applications ADD COLUMN result_email_image_url VARCHAR(255) NULL"
+        )
+    if 'last_email_type' not in columns:
+        migration_sql.append(
+            "ALTER TABLE applications ADD COLUMN last_email_type VARCHAR(30) NULL"
+        )
+    if 'last_email_sent' not in columns:
+        migration_sql.append(
+            "ALTER TABLE applications ADD COLUMN last_email_sent BOOLEAN NOT NULL DEFAULT FALSE"
+        )
+    if 'last_email_error' not in columns:
+        migration_sql.append(
+            "ALTER TABLE applications ADD COLUMN last_email_error TEXT NULL"
+        )
+    if 'last_email_sent_at' not in columns:
+        migration_sql.append(
+            "ALTER TABLE applications ADD COLUMN last_email_sent_at DATETIME NULL"
+        )
+    if 'feishu_message_id' not in columns:
+        migration_sql.append(
+            "ALTER TABLE applications ADD COLUMN feishu_message_id VARCHAR(120) NULL"
+        )
+    if 'feishu_open_message_id' not in columns:
+        migration_sql.append(
+            "ALTER TABLE applications ADD COLUMN feishu_open_message_id VARCHAR(120) NULL"
+        )
+    if 'feishu_delivery_mode' not in columns:
+        migration_sql.append(
+            "ALTER TABLE applications ADD COLUMN feishu_delivery_mode VARCHAR(20) NULL"
+        )
 
     for sql in migration_sql:
         db.session.execute(text(sql))
 
     if migration_sql:
+        db.session.commit()
+
+    missing_tokens = Application.query.filter(
+        (Application.action_token.is_(None)) | (Application.action_token == '')
+    ).all()
+    if missing_tokens:
+        for application in missing_tokens:
+            application.action_token = secrets.token_hex(24)
         db.session.commit()
 
 
@@ -44,10 +101,10 @@ def ensure_join_page_defaults():
 
     form = dict(join_page.content.get('form') or {})
     current_default = form.get('defaultGithubUrl')
-    if current_default not in (None, '', DEFAULT_GITHUB_URL):
+    if current_default not in (None, '', DEFAULT_GITHUB_URL, 'https://github.com'):
         return
 
-    form['defaultGithubUrl'] = DEFAULT_APPLICATION_GITHUB_URL
+    form['defaultGithubUrl'] = ''
     join_page.content = {
         **join_page.content,
         'form': form

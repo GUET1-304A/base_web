@@ -29,10 +29,10 @@
       <section class="projects-grid-section">
         <div class="projects-container">
           <div class="projects-grid">
-            <router-link 
-              v-for="(project, index) in filteredProjects" 
+            <router-link
+              v-for="(project, index) in filteredProjects"
               :key="index"
-              :to="project.link || '#'"
+              :to="project.slug ? `/project/${project.slug}` : (project.link || '#')"
               class="project-card"
             >
               <div :class="['project-cover', project.coverClass || 'aurora']">
@@ -43,14 +43,39 @@
                   class="project-cover-image"
                 />
                 <div class="cover-gradient"></div>
+                <span v-if="project.status === 'wip'" class="cover-badge wip">开发中</span>
+                <span v-else-if="project.featured" class="cover-badge featured">精选</span>
               </div>
               <div class="project-content">
-                <span class="project-category">{{ project.category }}</span>
+                <div class="project-meta">
+                  <span class="project-category">{{ project.category }}</span>
+                  <span v-if="project.startDate" class="project-date">{{ project.startDate }}</span>
+                </div>
                 <h3>{{ project.name }}</h3>
                 <p>{{ project.description }}</p>
+                <div v-if="project.contributors?.length" class="project-contributors">
+                  <div
+                    v-for="(contributor, cIndex) in project.contributors.slice(0, 3)"
+                    :key="cIndex"
+                    class="contributor-mini"
+                    :title="`${contributor.name} - ${contributor.role}`"
+                  >
+                    <img
+                      v-if="contributor.avatar"
+                      :src="contributor.avatar"
+                      :alt="contributor.name"
+                    />
+                    <div v-else class="mini-placeholder">
+                      {{ contributor.name?.charAt(0) || '?' }}
+                    </div>
+                  </div>
+                  <span v-if="project.contributors.length > 3" class="contributor-more">
+                    +{{ project.contributors.length - 3 }}
+                  </span>
+                </div>
                 <div class="project-tags">
-                  <span 
-                    v-for="(tag, tIndex) in project.tags" 
+                  <span
+                    v-for="(tag, tIndex) in project.tags"
                     :key="tIndex"
                     class="tag"
                   >
@@ -132,6 +157,9 @@ const filteredProjects = computed(() => {
   const projects = pageData.value.projects || defaultProjects
   if (activeFilter.value === '全部') {
     return projects
+  }
+  if (activeFilter.value === '精选') {
+    return projects.filter(p => p.featured)
   }
   return projects.filter(p => p.category === activeFilter.value)
 })
@@ -310,8 +338,36 @@ onMounted(async () => {
   background: linear-gradient(to top, rgba(5, 14, 28, 0.8) 0%, transparent 50%);
 }
 
+.cover-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 2;
+}
+
+.cover-badge.wip {
+  background: rgba(255, 183, 77, 0.9);
+  color: #1a1a1a;
+}
+
+.cover-badge.featured {
+  background: rgba(255, 215, 0, 0.9);
+  color: #1a1a1a;
+}
+
 .project-content {
   padding: 24px;
+}
+
+.project-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .project-category {
@@ -321,7 +377,55 @@ onMounted(async () => {
   border-radius: 999px;
   font-size: 12px;
   color: var(--primary);
+}
+
+.project-date {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.project-contributors {
+  display: flex;
+  align-items: center;
+  gap: 0;
   margin-bottom: 12px;
+}
+
+.contributor-mini {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--bg);
+  margin-left: -6px;
+  flex-shrink: 0;
+}
+
+.contributor-mini:first-child {
+  margin-left: 0;
+}
+
+.contributor-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mini-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #04101f;
+}
+
+.contributor-more {
+  margin-left: 6px;
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .project-content h3 {

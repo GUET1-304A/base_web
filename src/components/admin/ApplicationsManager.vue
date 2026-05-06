@@ -13,9 +13,12 @@
         </button>
       </div>
 
-      <button type="button" class="refresh-btn" @click="loadApplications" :disabled="loading">
-        {{ loading ? '刷新中...' : '刷新列表' }}
-      </button>
+      <div class="toolbar-right">
+        <span class="auto-refresh-hint">无未保存修改时每 8 秒与飞书同步</span>
+        <button type="button" class="refresh-btn" @click="loadApplications" :disabled="loading">
+          {{ loading ? '刷新中...' : '刷新列表' }}
+        </button>
+      </div>
     </div>
 
     <div v-if="errorMessage" class="panel-message error">{{ errorMessage }}</div>
@@ -39,7 +42,7 @@
             </p>
           </div>
           <span :class="['status-badge', `status-${drafts[application.id]?.status || application.status}`]">
-            {{ statusLabel(drafts[application.id]?.status || application.status) }}
+            {{ statusLabel(application) }}
           </span>
         </div>
 
@@ -48,6 +51,7 @@
           <div><span>专业</span><strong>{{ application.grade_major }}</strong></div>
           <div><span>手机号</span><strong>{{ application.phone }}</strong></div>
           <div><span>邮箱</span><strong>{{ application.email }}</strong></div>
+          <div><span>飞书渠道</span><strong>{{ feishuModeLabel(application) }}</strong></div>
           <div><span>飞书通知</span><strong>{{ application.feishu_sent ? '已发送' : '发送失败' }}</strong></div>
           <div><span>处理时间</span><strong>{{ formatTime(application.processed_at) || '未处理' }}</strong></div>
         </div>
@@ -79,6 +83,15 @@
           <p>{{ application.feishu_error }}</p>
         </div>
 
+        <div v-if="application.last_email_type" class="content-block">
+          <span>最近邮件</span>
+          <p>
+            {{ application.last_email_type }}
+            ·
+            {{ application.last_email_sent ? '已发送' : (application.last_email_error || '发送失败') }}
+          </p>
+        </div>
+
         <div class="editor-grid">
           <label class="form-group">
             <span>处理状态</span>
@@ -98,6 +111,33 @@
               placeholder="记录跟进情况、面试安排或处理结果"
             ></textarea>
           </label>
+
+          <label class="form-group form-group-wide">
+            <span>考核群信息</span>
+            <textarea
+              v-model.trim="drafts[application.id].review_group_info"
+              rows="3"
+              placeholder="通过时会写入结果邮件和飞书状态通知"
+            ></textarea>
+          </label>
+
+          <label class="form-group form-group-wide">
+            <span>邮件附加链接</span>
+            <textarea
+              v-model.trim="drafts[application.id].result_email_links"
+              rows="3"
+              placeholder="每行一个链接，例如：https://example.com"
+            ></textarea>
+          </label>
+
+          <label class="form-group form-group-wide">
+            <span>邮件图片 URL</span>
+            <textarea
+              v-model.trim="drafts[application.id].result_email_image_url"
+              rows="2"
+              placeholder="例如：https://example.com/qrcode.png"
+            ></textarea>
+          </label>
         </div>
 
         <div class="card-actions">
@@ -109,6 +149,50 @@
           >
             {{ savingId === application.id ? '保存中...' : '保存处理状态' }}
           </button>
+          <button
+            type="button"
+            class="danger-btn"
+            :disabled="savingId === application.id"
+            @click="deleteApplication(application)"
+          >
+            删除
+          </button>
+          <button
+            v-if="canReviewWorkflow(application)"
+            type="button"
+            class="ghost-btn"
+            :disabled="savingId === application.id"
+            @click="applyAction(application, 'reviewing')"
+          >
+            标记处理中
+          </button>
+          <button
+            v-if="canReviewWorkflow(application)"
+            type="button"
+            class="save-btn"
+            :disabled="savingId === application.id"
+            @click="applyAction(application, 'approve')"
+          >
+            通过并发邮件
+          </button>
+          <button
+            v-if="canReviewWorkflow(application)"
+            type="button"
+            class="danger-btn"
+            :disabled="savingId === application.id"
+            @click="applyAction(application, 'reject')"
+          >
+            拒绝并发邮件
+          </button>
+          <button
+            v-if="canArchive(application)"
+            type="button"
+            class="ghost-btn"
+            :disabled="savingId === application.id"
+            @click="applyAction(application, 'archive')"
+          >
+            归档录用
+          </button>
         </div>
       </article>
     </div>
@@ -116,8 +200,11 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { api } from '../../services/api.js'
+
+const POLL_MS = 8000
+let pollTimer = null
 
 const applications = ref([])
 const drafts = ref({})
@@ -135,13 +222,33 @@ const filters = [
   { value: 'archived', label: '已归档' }
 ]
 
-function statusLabel(status) {
-  return {
-    pending: '待处理',
-    reviewing: '处理中',
-    processed: '已处理',
-    archived: '已归档'
-  }[status] || '待处理'
+function statusLabel(application) {
+  const draft = drafts.value[application.id]
+  const s = draft?.status || application.status || 'pending'
+  if (s === 'processed') {
+    if (application.result_type === 'approved') return '已处理 · 已通过'
+    if (application.result_type === 'rejected') return '已处理 · 已拒绝'
+    return '已处理'
+  }
+  if (s === 'archived') return '已归档'
+  if (s === 'reviewing') return '处理中'
+  return '待处理'
+}
+
+function feishuModeLabel(application) {
+  const m = application.feishu_delivery_mode
+  if (m === 'app') return '应用机器人'
+  if (m === 'webhook') return 'Webhook'
+  return '—'
+}
+
+function canReviewWorkflow(application) {
+  const s = application.status
+  return s === 'pending' || s === 'reviewing'
+}
+
+function canArchive(application) {
+  return application.status === 'processed' && application.result_type === 'approved'
 }
 
 function formatTime(value) {
@@ -157,7 +264,10 @@ function setDrafts(items) {
       item.id,
       {
         status: item.status || 'pending',
-        admin_note: item.admin_note || ''
+        admin_note: item.admin_note || '',
+        review_group_info: item.review_group_info || '',
+        result_email_links: item.result_email_links || '',
+        result_email_image_url: item.result_email_image_url || ''
       }
     ])
   )
@@ -168,7 +278,10 @@ function hasChanges(application) {
   if (!draft) return false
   return (
     draft.status !== (application.status || 'pending') ||
-    (draft.admin_note || '') !== (application.admin_note || '')
+    (draft.admin_note || '') !== (application.admin_note || '') ||
+    (draft.review_group_info || '') !== (application.review_group_info || '') ||
+    (draft.result_email_links || '') !== (application.result_email_links || '') ||
+    (draft.result_email_image_url || '') !== (application.result_email_image_url || '')
   )
 }
 
@@ -204,7 +317,10 @@ async function saveApplication(application) {
     }
     drafts.value[application.id] = {
       status: nextItem.status || 'pending',
-      admin_note: nextItem.admin_note || ''
+      admin_note: nextItem.admin_note || '',
+      review_group_info: nextItem.review_group_info || '',
+      result_email_links: nextItem.result_email_links || '',
+      result_email_image_url: nextItem.result_email_image_url || ''
     }
     successMessage.value = '报名记录已更新'
   } catch (error) {
@@ -214,12 +330,96 @@ async function saveApplication(application) {
   }
 }
 
+async function applyAction(application, action) {
+  savingId.value = application.id
+  errorMessage.value = ''
+  successMessage.value = ''
+
+  try {
+    const result = await api.updateApplication(application.id, {
+      action,
+      admin_note: drafts.value[application.id].admin_note,
+      review_group_info: drafts.value[application.id].review_group_info,
+      result_email_links: drafts.value[application.id].result_email_links,
+      result_email_image_url: drafts.value[application.id].result_email_image_url
+    })
+    const nextItem = result.application
+    const index = applications.value.findIndex((item) => item.id === application.id)
+
+    if (activeFilter.value !== 'all' && nextItem.status !== activeFilter.value) {
+      applications.value = applications.value.filter((item) => item.id !== application.id)
+    } else if (index >= 0) {
+      applications.value[index] = nextItem
+    }
+
+    drafts.value[application.id] = {
+      status: nextItem.status || 'pending',
+      admin_note: nextItem.admin_note || '',
+      review_group_info: nextItem.review_group_info || '',
+      result_email_links: nextItem.result_email_links || '',
+      result_email_image_url: nextItem.result_email_image_url || ''
+    }
+
+    const warnings = [result.email_warning, result.feishu_warning].filter(Boolean)
+    successMessage.value = warnings.length
+      ? `处理完成，但存在提醒：${warnings.join('；')}`
+      : '报名流程已更新'
+  } catch (error) {
+    errorMessage.value = error.message || '处理失败'
+  } finally {
+    savingId.value = null
+  }
+}
+
+async function deleteApplication(application) {
+  const hint = hasChanges(application) ? '（当前有未保存修改，删除后将丢失）' : ''
+  const ok = typeof window !== 'undefined'
+    ? window.confirm(`确认删除报名记录「${application.name}」${hint}？此操作不可恢复。`)
+    : true
+  if (!ok) return
+
+  savingId.value = application.id
+  errorMessage.value = ''
+  successMessage.value = ''
+
+  try {
+    await api.deleteApplication(application.id)
+    applications.value = applications.value.filter((item) => item.id !== application.id)
+    const nextDrafts = { ...drafts.value }
+    delete nextDrafts[application.id]
+    drafts.value = nextDrafts
+    successMessage.value = '报名记录已删除'
+  } catch (error) {
+    errorMessage.value = error.message || '删除失败'
+  } finally {
+    savingId.value = null
+  }
+}
+
 watch(activeFilter, () => {
   loadApplications()
 })
 
+async function silentRefresh() {
+  if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return
+  if (savingId.value || loading.value) return
+  if (applications.value.some((a) => hasChanges(a))) return
+  try {
+    const data = await api.getApplications(activeFilter.value)
+    applications.value = data
+    setDrafts(data)
+  } catch {
+    /* 静默失败，避免打断管理员操作 */
+  }
+}
+
 onMounted(() => {
   loadApplications()
+  pollTimer = setInterval(silentRefresh, POLL_MS)
+})
+
+onUnmounted(() => {
+  if (pollTimer) clearInterval(pollTimer)
 })
 </script>
 
@@ -238,6 +438,20 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.auto-refresh-hint {
+  font-size: 12px;
+  color: var(--muted);
+  max-width: 220px;
+  line-height: 1.4;
+}
+
 .filter-group {
   display: flex;
   flex-wrap: wrap;
@@ -246,7 +460,9 @@ onMounted(() => {
 
 .filter-btn,
 .refresh-btn,
-.save-btn {
+.save-btn,
+.ghost-btn,
+.danger-btn {
   border: 1px solid var(--panel-border);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.04);
@@ -269,7 +485,9 @@ onMounted(() => {
 
 .refresh-btn:hover,
 .filter-btn:hover,
-.save-btn:hover:not(:disabled) {
+.save-btn:hover:not(:disabled),
+.ghost-btn:hover:not(:disabled),
+.danger-btn:hover:not(:disabled) {
   border-color: rgba(121, 168, 255, 0.4);
 }
 
@@ -447,7 +665,9 @@ onMounted(() => {
 
 .card-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  gap: 12px;
 }
 
 .save-btn {
@@ -461,6 +681,21 @@ onMounted(() => {
 .save-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.ghost-btn,
+.danger-btn {
+  padding: 12px 18px;
+}
+
+.ghost-btn {
+  color: var(--text);
+}
+
+.danger-btn {
+  background: rgba(255, 100, 100, 0.12);
+  border-color: rgba(255, 100, 100, 0.22);
+  color: #ffd3d3;
 }
 
 @media (max-width: 760px) {
@@ -477,7 +712,9 @@ onMounted(() => {
     justify-content: stretch;
   }
 
-  .save-btn {
+  .save-btn,
+  .ghost-btn,
+  .danger-btn {
     width: 100%;
   }
 }

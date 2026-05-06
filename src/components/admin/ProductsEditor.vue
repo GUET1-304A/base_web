@@ -117,7 +117,17 @@
         <div class="projects-section">
           <div class="section-header">
             <h4>章节内项目</h4>
-            <button class="add-btn small" @click="addProject">+ 添加项目</button>
+            <div class="add-project-actions">
+              <select class="field-input small-select" @change="importProject($event.target.value); $event.target.value = ''">
+                <option value="">从项目展示导入...</option>
+                <option
+                  v-for="p in availableProjects"
+                  :key="p.slug"
+                  :value="p.slug"
+                >{{ p.name }}</option>
+              </select>
+              <button class="add-btn small" @click="addProject">+ 空白项目</button>
+            </div>
           </div>
           
           <div class="projects-list">
@@ -135,7 +145,7 @@
                 <div class="form-row">
                   <div class="form-field">
                     <label class="field-label">项目名称</label>
-                    <input 
+                    <input
                       type="text"
                       class="field-input"
                       :value="project.name"
@@ -145,24 +155,47 @@
                   </div>
                   <div class="form-field">
                     <label class="field-label">所属分类</label>
-                    <select 
+                    <select
                       class="field-input"
                       :value="project.category"
                       @change="updateProject(pIndex, 'category', $event.target.value)"
                     >
                       <option value="">选择分类</option>
-                      <option 
-                        v-for="cat in modelValue.categories" 
-                        :key="cat" 
+                      <option
+                        v-for="cat in modelValue.categories"
+                        :key="cat"
                         :value="cat"
                       >{{ cat }}</option>
                     </select>
                   </div>
                 </div>
-                
+
+                <div class="form-row">
+                  <div class="form-field">
+                    <label class="field-label">Slug (URL 标识)</label>
+                    <input
+                      type="text"
+                      class="field-input"
+                      :value="project.slug || ''"
+                      @input="updateProject(pIndex, 'slug', $event.target.value)"
+                      placeholder="如: star-chart"
+                    >
+                  </div>
+                  <div class="form-field">
+                    <label class="field-label">技术栈 (逗号分隔)</label>
+                    <input
+                      type="text"
+                      class="field-input"
+                      :value="(project.techStack || []).join(', ')"
+                      @input="updateTechStack(pIndex, $event.target.value)"
+                      placeholder="Vue 3, Flask, MySQL"
+                    >
+                  </div>
+                </div>
+
                 <div class="form-field">
                   <label class="field-label">项目描述</label>
-                  <textarea 
+                  <textarea
                     class="field-textarea small"
                     :value="project.description"
                     @input="updateProject(pIndex, 'description', $event.target.value)"
@@ -170,21 +203,21 @@
                     rows="2"
                   ></textarea>
                 </div>
-                
+
                 <div class="form-row">
                   <div class="form-field">
                     <label class="field-label">链接地址</label>
-                    <input 
+                    <input
                       type="text"
                       class="field-input"
                       :value="project.link"
                       @input="updateProject(pIndex, 'link', $event.target.value)"
-                      placeholder="/pages/xxx.html"
+                      placeholder="/onboarding"
                     >
                   </div>
                   <div class="form-field">
                     <label class="field-label">封面样式</label>
-                    <select 
+                    <select
                       class="field-input"
                       :value="project.coverClass"
                       @change="updateProject(pIndex, 'coverClass', $event.target.value)"
@@ -199,13 +232,21 @@
                   </div>
                 </div>
 
-                <div class="form-field">
-                  <ImageUploadField
-                    :model-value="project.coverImage || ''"
-                    label="项目封面图"
-                    hint="上传后将优先显示图片，未上传时使用渐变封面"
-                    @update:model-value="updateProject(pIndex, 'coverImage', $event)"
-                  />
+                <div class="form-row">
+                  <div class="form-field">
+                    <ImageUploadField
+                      :model-value="project.coverImage || ''"
+                      label="项目封面图"
+                      hint="上传后将优先显示图片，未上传时使用渐变封面"
+                      @update:model-value="updateProject(pIndex, 'coverImage', $event)"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label class="field-label">精选项目</label>
+                    <p class="field-hint">
+                      请前往 <strong>页面管理 → 项目展示</strong> 中设置项目的精选状态，首页将自动同步。
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -225,8 +266,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import ImageUploadField from './ImageUploadField.vue'
+import { api } from '../../services/api.js'
 
 const props = defineProps({
   modelValue: {
@@ -238,8 +280,50 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const activeSlide = ref(0)
+const pageProjects = ref([])
+
+onMounted(async () => {
+  try {
+    const data = await api.getPage('projects')
+    if (data?.projects) pageProjects.value = data.projects
+  } catch {}
+})
 
 const currentSlide = computed(() => props.modelValue.slides?.[activeSlide.value])
+
+const currentSlugs = computed(() => {
+  const slugs = new Set()
+  for (const slide of (props.modelValue.slides || [])) {
+    for (const p of (slide.projects || [])) {
+      if (p.slug) slugs.add(p.slug)
+    }
+  }
+  return slugs
+})
+
+const availableProjects = computed(() =>
+  pageProjects.value.filter(p => !currentSlugs.value.has(p.slug))
+)
+
+function importProject(slug) {
+  if (!slug) return
+  const source = pageProjects.value.find(p => p.slug === slug)
+  if (!source) return
+  const slides = [...props.modelValue.slides]
+  const projects = [...(slides[activeSlide.value].projects || []), {
+    name: source.name || '',
+    slug: source.slug || '',
+    category: source.category || '',
+    description: source.description || '',
+    link: source.link || '',
+    coverImage: source.coverImage || '',
+    coverClass: source.coverClass || 'aurora',
+    techStack: source.techStack || [],
+    featured: source.featured || false,
+  }]
+  slides[activeSlide.value] = { ...slides[activeSlide.value], projects }
+  emit('update:modelValue', { ...props.modelValue, slides })
+}
 
 function update(key, value) {
   emit('update:modelValue', { ...props.modelValue, [key]: value })
@@ -300,10 +384,13 @@ function addProject() {
   const projects = [...(slides[activeSlide.value].projects || []), {
     category: '',
     name: '',
+    slug: '',
     description: '',
     link: '',
     coverImage: '',
-    coverClass: 'aurora'
+    coverClass: 'aurora',
+    techStack: [],
+    featured: false
   }]
   slides[activeSlide.value] = { ...slides[activeSlide.value], projects }
   emit('update:modelValue', { ...props.modelValue, slides })
@@ -314,6 +401,11 @@ function removeProject(pIndex) {
   const projects = (slides[activeSlide.value].projects || []).filter((_, i) => i !== pIndex)
   slides[activeSlide.value] = { ...slides[activeSlide.value], projects }
   emit('update:modelValue', { ...props.modelValue, slides })
+}
+
+function updateTechStack(pIndex, value) {
+  const techStack = value.split(',').map(s => s.trim()).filter(Boolean)
+  updateProject(pIndex, 'techStack', techStack)
 }
 </script>
 
@@ -575,5 +667,33 @@ select.field-input {
 
 .empty-state.small {
   padding: 24px;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 8px 0 0;
+  padding: 10px 14px;
+  background: rgba(121, 168, 255, 0.06);
+  border-radius: 8px;
+  border: 1px solid rgba(121, 168, 255, 0.1);
+}
+
+.field-hint strong {
+  color: var(--primary);
+}
+
+.add-project-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.small-select {
+  padding: 6px 12px;
+  font-size: 12px;
+  min-width: 160px;
+  cursor: pointer;
 }
 </style>

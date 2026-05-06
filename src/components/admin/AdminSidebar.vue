@@ -55,11 +55,11 @@
         <span v-if="!collapsed" class="nav-section-title">系统设置</span>
         <button
           :class="['nav-item', { active: activeSection === 'system' }]"
-          :title="collapsed ? '通知 Webhook' : ''"
+          :title="collapsed ? '通知设置' : ''"
           @click="selectSection('system')"
         >
           <span class="nav-icon">⚙</span>
-          <span v-if="!collapsed" class="nav-label">通知 Webhook</span>
+          <span v-if="!collapsed" class="nav-label">通知设置</span>
         </button>
       </div>
       

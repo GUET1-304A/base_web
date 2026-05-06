@@ -119,7 +119,6 @@ import { ref, onMounted, watch } from 'vue'
 import { api } from '../services/api.js'
 import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue'
-import { DEFAULT_APPLICATION_GITHUB_URL } from '../constants/externalLinks.js'
 
 const pageData = ref({})
 const selectedGroup = ref(null)
@@ -133,7 +132,7 @@ const applicationForm = ref({
   phone: '',
   email: '',
   group_id: '',
-  github_url: DEFAULT_APPLICATION_GITHUB_URL,
+  github_url: '',
   portfolio_url: '',
   experience: '',
   motivation: ''
@@ -167,11 +166,8 @@ watch(() => applicationForm.value.group_id, (value) => {
 })
 
 watch(() => pageData.value.form?.defaultGithubUrl, (value) => {
-  if (
-    !applicationForm.value.github_url ||
-    applicationForm.value.github_url === DEFAULT_APPLICATION_GITHUB_URL
-  ) {
-    applicationForm.value.github_url = value || DEFAULT_APPLICATION_GITHUB_URL
+  if (!applicationForm.value.github_url) {
+    applicationForm.value.github_url = value || ''
   }
 })
 
@@ -183,7 +179,7 @@ function resetApplicationForm() {
     phone: '',
     email: '',
     group_id: selectedGroup.value || '',
-    github_url: pageData.value.form?.defaultGithubUrl || DEFAULT_APPLICATION_GITHUB_URL,
+    github_url: pageData.value.form?.defaultGithubUrl || '',
     portfolio_url: '',
     experience: '',
     motivation: ''
@@ -209,10 +205,6 @@ async function submitApplication() {
   try {
     const result = await api.submitApplication({
       ...applicationForm.value,
-      github_url:
-        applicationForm.value.github_url === DEFAULT_APPLICATION_GITHUB_URL
-          ? ''
-          : applicationForm.value.github_url,
       group_name: selectedGroupData.name
     })
 

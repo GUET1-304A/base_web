@@ -5,7 +5,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 DEFAULT_GITHUB_URL = os.environ.get("DEFAULT_GITHUB_URL") or "https://github.com/GUET1-304A"
-DEFAULT_APPLICATION_GITHUB_URL = os.environ.get("DEFAULT_APPLICATION_GITHUB_URL") or "https://github.com"
+DEFAULT_APPLICATION_GITHUB_URL = os.environ.get("DEFAULT_APPLICATION_GITHUB_URL") or ""
 DEFAULT_FEISHU_WEBHOOK_URL = (os.environ.get("FEISHU_WEBHOOK_URL") or "").strip()
 
 DEFAULT_SITE_CONFIG = {
@@ -18,8 +18,8 @@ DEFAULT_SITE_CONFIG = {
             {"value": "12+", "label": "协作项目"},
             {"value": "100%", "label": "鼓励开源"},
             {"value": "5+", "label": "参与开源社区"},
-            {"value": "TRAE", "label": "合作社区"},
-            {"value": "NULL", "label": "参与比赛"}
+            {"value": "3+", "label": "合作社区"},
+            {"value": "2+", "label": "参与比赛"}
         ],
         "signalCard": {
             "eyebrow": "协作 · 创造 · 分享",
@@ -57,9 +57,9 @@ DEFAULT_SITE_CONFIG = {
                 "description": "星雨作坊的产品并不是孤立存在的单点项目，而是围绕真实需求持续迭代的作品群。我们希望每一项作品都能成为下一项作品的起点。",
                 "metrics": [{"value": "03", "label": "核心章节"}, {"value": "06", "label": "示例作品"}, {"value": "∞", "label": "持续迭代"}],
                 "projects": [
-                    {"category": "网站平台", "name": "星图导航", "description": "为新成员与访客整理社团资讯、活动日历与学习路线的门户网站。", "link": "/onboarding", "coverClass": "aurora"},
-                    {"category": "效率工具", "name": "雨记协作板", "description": "支持任务拆分、进度同步与复盘记录的轻量化协作工具。", "link": "/yuji", "coverClass": "meteor"},
-                    {"category": "品牌内容", "name": "星雨年刊", "description": "沉淀年度作品、社团故事和成员成长轨迹的数字刊物与视觉专题。", "link": "/timeline", "coverClass": "nebula"}
+                    {"category": "网站平台", "name": "星图导航", "slug": "star-chart", "description": "为新成员与访客整理社团资讯、活动日历与学习路线的门户网站。", "link": "/onboarding", "coverClass": "aurora", "featured": True, "techStack": ["Vue 3", "Tailwind CSS", "Flask"]},
+                    {"category": "效率工具", "name": "雨记协作板", "slug": "rain-note", "description": "支持任务拆分、进度同步与复盘记录的轻量化协作工具。", "link": "/yuji", "coverClass": "meteor", "featured": True, "techStack": ["Vue 3", "Rust", "WebSocket"]},
+                    {"category": "品牌内容", "name": "星雨年刊", "slug": "xingyu-annual", "description": "沉淀年度作品、社团故事和成员成长轨迹的数字刊物与视觉专题。", "link": "/timeline", "coverClass": "nebula", "techStack": ["设计", "内容策划"]}
                 ]
             },
             {
@@ -68,8 +68,8 @@ DEFAULT_SITE_CONFIG = {
                 "description": "这一类项目强调信息组织、交互体验与系统稳定性，通常会面向成员、访客或校园用户提供长期使用的服务入口。",
                 "metrics": [],
                 "projects": [
-                    {"category": "网站平台", "name": "星图导航", "description": "为新成员与访客整理社团资讯、活动日历与学习路线的门户网站。", "link": "/onboarding", "coverClass": "aurora"},
-                    {"category": "网站平台", "name": "活动报名系统", "description": "用于活动预告、报名管理和数据统计，帮助组织流程更顺畅。", "link": "", "coverClass": "cosmos"}
+                    {"category": "网站平台", "name": "星图导航", "slug": "star-chart", "description": "为新成员与访客整理社团资讯、活动日历与学习路线的门户网站。", "link": "/onboarding", "coverClass": "aurora", "featured": True, "techStack": ["Vue 3", "Tailwind CSS", "Flask"]},
+                    {"category": "网站平台", "name": "活动报名系统", "slug": "event-system", "description": "用于活动预告、报名管理和数据统计，帮助组织流程更顺畅。", "link": "", "coverClass": "cosmos", "techStack": ["Vue 3", "Flask"]}
                 ]
             },
             {
@@ -78,8 +78,8 @@ DEFAULT_SITE_CONFIG = {
                 "description": "这类作品更关注成员内部的协同、记录与复盘，希望通过轻量工具减少沟通成本，让创作和执行更流畅。",
                 "metrics": [],
                 "projects": [
-                    {"category": "效率工具", "name": "雨记协作板", "description": "支持任务拆分、进度同步与复盘记录的轻量化协作工具。", "link": "/yuji", "coverClass": "meteor"},
-                    {"category": "效率工具", "name": "灵感收集箱", "description": "面向社团成员的灵感归档空间，方便记录选题、链接和碎片创意。", "link": "", "coverClass": "pulse"}
+                    {"category": "效率工具", "name": "雨记协作板", "slug": "rain-note", "description": "支持任务拆分、进度同步与复盘记录的轻量化协作工具。", "link": "/yuji", "coverClass": "meteor", "featured": True, "techStack": ["Vue 3", "Rust", "WebSocket"]},
+                    {"category": "效率工具", "name": "灵感收集箱", "slug": "idea-box", "description": "面向社团成员的灵感归档空间，方便记录选题、链接和碎片创意。", "link": "", "coverClass": "pulse", "techStack": ["Vue 3"]}
                 ]
             },
             {
@@ -88,8 +88,8 @@ DEFAULT_SITE_CONFIG = {
                 "description": "这一部分更关注视觉表达、内容包装和公开传播，让社团成果能够以更完整、更动人的方式被外界感知。",
                 "metrics": [],
                 "projects": [
-                    {"category": "品牌内容", "name": "星雨年刊", "description": "沉淀年度作品、社团故事和成员成长轨迹的数字刊物与视觉专题。", "link": "/timeline", "coverClass": "nebula"},
-                    {"category": "品牌内容", "name": "开放分享计划", "description": "将讲座回顾、教程文章和项目经验整理成公开可访问的内容合集。", "link": "/blog", "coverClass": "horizon"}
+                    {"category": "品牌内容", "name": "星雨年刊", "slug": "xingyu-annual", "description": "沉淀年度作品、社团故事和成员成长轨迹的数字刊物与视觉专题。", "link": "/timeline", "coverClass": "nebula", "techStack": ["设计", "内容策划"]},
+                    {"category": "品牌内容", "name": "开放分享计划", "slug": "open-sharing", "description": "将讲座回顾、教程文章和项目经验整理成公开可访问的内容合集。", "link": "/blog", "coverClass": "horizon", "techStack": ["内容", "社媒"]}
                 ]
             }
         ]
@@ -114,7 +114,9 @@ DEFAULT_SITE_CONFIG = {
         "slogan": "以协作连接灵感，以开源延续成长。"
     },
     "system": {
-        "feishuWebhookUrl": DEFAULT_FEISHU_WEBHOOK_URL
+        "feishuMode": "app",
+        "feishuWebhookUrl": DEFAULT_FEISHU_WEBHOOK_URL,
+        "feishuAppChatId": ""
     }
 }
 
@@ -176,9 +178,9 @@ DEFAULT_PAGES = {
                 "subtitle": "每一颗星都有独特的光芒，共同组成星雨的银河。"
             },
             "members": [
-                {"name": "张三", "role": "产品负责人", "group": "流光组", "avatar": "", "description": "专注于产品战略与用户体验设计", "skills": ["产品设计", "用户研究", "项目管理"], "links": {"github": DEFAULT_GITHUB_URL, "portfolio": ""}},
-                {"name": "李四", "role": "技术负责人", "group": "逐云组", "avatar": "", "description": "全栈工程师，热衷于开源项目", "skills": ["Vue", "Python", "DevOps"], "links": {"github": DEFAULT_GITHUB_URL, "portfolio": ""}},
-                {"name": "王五", "role": "设计负责人", "group": "星绘组", "avatar": "", "description": "UI/UX 设计师，追求像素完美", "skills": ["UI设计", "品牌设计", "动效设计"], "links": {"github": DEFAULT_GITHUB_URL, "portfolio": ""}}
+                {"name": "陈星宇", "role": "产品负责人", "group": "流光组", "avatar": "", "description": "专注于产品战略与用户体验设计，擅长将复杂需求转化为清晰的产品方案", "skills": ["产品设计", "用户研究", "项目管理"], "links": {"github": DEFAULT_GITHUB_URL, "portfolio": ""}, "projects": [{"name": "星图导航", "slug": "star-chart", "role": "产品策划"}, {"name": "雨记协作板", "slug": "rain-note", "role": "需求分析"}]},
+                {"name": "赵鹏程", "role": "技术负责人", "group": "逐云组", "avatar": "", "description": "全栈工程师，热衷于开源项目，主导多个核心系统的架构设计", "skills": ["Vue", "Python", "Rust", "DevOps"], "links": {"github": DEFAULT_GITHUB_URL, "portfolio": ""}, "projects": [{"name": "雨记协作板", "slug": "rain-note", "role": "全栈开发"}, {"name": "星图导航", "slug": "star-chart", "role": "后端开发"}]},
+                {"name": "林悦", "role": "设计负责人", "group": "星绘组", "avatar": "", "description": "UI/UX 设计师，追求像素完美，负责社团整体视觉语言", "skills": ["UI设计", "品牌设计", "动效设计"], "links": {"github": DEFAULT_GITHUB_URL, "portfolio": ""}, "projects": [{"name": "星图导航", "slug": "star-chart", "role": "UI 设计"}, {"name": "星雨年刊", "slug": "xingyu-annual", "role": "主编 / 设计"}]}
             ],
             "stats": [
                 {"value": "12+", "label": "核心成员"},
@@ -201,11 +203,143 @@ DEFAULT_PAGES = {
                 "title": "产品画廊",
                 "subtitle": "探索我们精心打造的数字作品集，每一件都承载着创新与匠心。"
             },
-            "filters": ["全部", "网页", "工具", "品牌"],
+            "filters": ["全部", "精选", "网站平台", "效率工具", "品牌内容"],
             "projects": [
-                {"name": "星图导航", "category": "网页", "description": "为新成员与访客整理社团资讯的门户网站", "coverClass": "aurora", "link": "/onboarding", "tags": ["Vue", "Tailwind"]},
-                {"name": "雨记协作板", "category": "工具", "description": "支持任务拆分、进度同步的轻量化协作工具", "coverClass": "meteor", "link": "/yuji", "tags": ["React", "Node.js"]},
-                {"name": "星雨年刊", "category": "品牌", "description": "沉淀年度作品与社团故事的数字刊物", "coverClass": "nebula", "link": "/timeline", "tags": ["设计", "内容"]}
+                {
+                    "name": "星图导航",
+                    "slug": "star-chart",
+                    "category": "网站平台",
+                    "description": "为新成员与访客整理社团资讯、活动日历与学习路线的门户网站。",
+                    "longDescription": "星图导航是星雨作坊面向新成员与外部访客打造的信息门户。它整合了社团介绍、活动日历、学习路线与项目索引，帮助新人快速了解社团的组织架构、当前项目和学习资源。\n\n项目采用 Vue 3 + Tailwind CSS 构建前端，后端使用 Flask 提供 API 服务，数据存储在 MySQL 中。整个站点支持响应式布局，适配桌面与移动端访问。",
+                    "coverClass": "aurora",
+                    "coverImage": "",
+                    "screenshots": [],
+                    "techStack": ["Vue 3", "Tailwind CSS", "Flask", "MySQL"],
+                    "contributors": [
+                        {"name": "陈星宇", "role": "前端开发", "avatar": ""},
+                        {"name": "林悦", "role": "UI 设计", "avatar": ""},
+                        {"name": "赵鹏程", "role": "后端开发", "avatar": ""}
+                    ],
+                    "githubUrl": DEFAULT_GITHUB_URL,
+                    "demoUrl": "",
+                    "link": "/onboarding",
+                    "tags": ["Vue", "Tailwind"],
+                    "status": "active",
+                    "featured": True,
+                    "startDate": "2024-09"
+                },
+                {
+                    "name": "雨记协作板",
+                    "slug": "rain-note",
+                    "category": "效率工具",
+                    "description": "支持任务拆分、进度同步与复盘记录的轻量化协作工具。",
+                    "longDescription": "雨记协作板是星雨作坊自主研发的轻量级团队协作工具，专注于小型团队的任务管理与进度同步。它支持多人实时协作编辑、任务拆分与看板视图、复盘记录与知识沉淀，以及轻量化部署。\n\n前端使用 Vue 3 构建交互界面，后端采用 Rust 实现高性能 API 服务，通过 WebSocket 支持实时同步。项目以 MIT 协议开源，欢迎社区贡献。",
+                    "coverClass": "meteor",
+                    "coverImage": "",
+                    "screenshots": [],
+                    "techStack": ["Vue 3", "Rust", "WebSocket", "PostgreSQL"],
+                    "contributors": [
+                        {"name": "赵鹏程", "role": "全栈开发", "avatar": ""},
+                        {"name": "陈星宇", "role": "前端开发", "avatar": ""},
+                        {"name": "王思远", "role": "后端开发", "avatar": ""}
+                    ],
+                    "githubUrl": DEFAULT_GITHUB_URL,
+                    "demoUrl": "",
+                    "link": "/yuji",
+                    "tags": ["Vue", "Rust", "WebSocket"],
+                    "status": "active",
+                    "featured": True,
+                    "startDate": "2024-03"
+                },
+                {
+                    "name": "星雨年刊",
+                    "slug": "xingyu-annual",
+                    "category": "品牌内容",
+                    "description": "沉淀年度作品、社团故事和成员成长轨迹的数字刊物与视觉专题。",
+                    "longDescription": "星雨年刊是社团每年出品的数字刊物，记录过去一年的项目成果、成员成长与社团故事。它既是对外展示社团实力的品牌载体，也是对内沉淀经验、激励新人的重要文档。\n\n年刊内容涵盖年度项目回顾、技术栈演进、成员专访、活动纪实与未来展望。设计上追求杂志级的排版品质，以在线阅读和 PDF 两种形式发布。",
+                    "coverClass": "nebula",
+                    "coverImage": "",
+                    "screenshots": [],
+                    "techStack": ["设计", "内容策划", "排版"],
+                    "contributors": [
+                        {"name": "林悦", "role": "主编 / 设计", "avatar": ""},
+                        {"name": "周涵", "role": "内容编辑", "avatar": ""},
+                        {"name": "张雨桐", "role": "摄影 / 插画", "avatar": ""}
+                    ],
+                    "githubUrl": "",
+                    "demoUrl": "",
+                    "link": "/timeline",
+                    "tags": ["设计", "内容"],
+                    "status": "active",
+                    "featured": False,
+                    "startDate": "2024-11"
+                },
+                {
+                    "name": "活动报名系统",
+                    "slug": "event-system",
+                    "category": "网站平台",
+                    "description": "用于活动预告、报名管理和数据统计，帮助组织流程更顺畅。",
+                    "longDescription": "活动报名系统是星雨作坊为校园活动管理打造的在线平台。它支持活动创建与发布、在线报名与签到、参与者数据统计与导出，帮助社团和学生组织更高效地管理各类活动。\n\n系统采用 Vue 3 构建前端交互界面，后端使用 Flask 提供 RESTful API，支持响应式布局，适配移动端报名场景。",
+                    "coverClass": "cosmos",
+                    "coverImage": "",
+                    "screenshots": [],
+                    "techStack": ["Vue 3", "Flask", "MySQL"],
+                    "contributors": [
+                        {"name": "陈星宇", "role": "产品设计", "avatar": ""},
+                        {"name": "赵鹏程", "role": "后端开发", "avatar": ""}
+                    ],
+                    "githubUrl": "",
+                    "demoUrl": "",
+                    "link": "",
+                    "tags": ["Vue", "Flask"],
+                    "status": "wip",
+                    "featured": False,
+                    "startDate": "2025-01"
+                },
+                {
+                    "name": "灵感收集箱",
+                    "slug": "idea-box",
+                    "category": "效率工具",
+                    "description": "面向社团成员的灵感归档空间，方便记录选题、链接和碎片创意。",
+                    "longDescription": "灵感收集箱是面向社团成员的轻量级创意管理工具。成员可以随时记录灵感碎片、收藏有价值的链接、整理选题方向，并通过标签和分类系统快速检索历史记录。\n\n项目采用 Vue 3 构建单页应用，追求极简的交互体验，让记录灵感的门槛降到最低。",
+                    "coverClass": "pulse",
+                    "coverImage": "",
+                    "screenshots": [],
+                    "techStack": ["Vue 3", "LocalStorage"],
+                    "contributors": [
+                        {"name": "林悦", "role": "UI 设计", "avatar": ""},
+                        {"name": "赵鹏程", "role": "前端开发", "avatar": ""}
+                    ],
+                    "githubUrl": "",
+                    "demoUrl": "",
+                    "link": "",
+                    "tags": ["Vue"],
+                    "status": "wip",
+                    "featured": False,
+                    "startDate": "2025-02"
+                },
+                {
+                    "name": "开放分享计划",
+                    "slug": "open-sharing",
+                    "category": "品牌内容",
+                    "description": "将讲座回顾、教程文章和项目经验整理成公开可访问的内容合集。",
+                    "longDescription": "开放分享计划是星雨作坊的知识外化项目，旨在将社团内部的技术讲座、设计工作坊、项目复盘等内容整理成公开可访问的文章和教程，回馈更广泛的开发者社区。\n\n内容形式包括技术博客、视频回放、项目案例分析和工具使用教程，通过社团官网和社交媒体渠道发布。",
+                    "coverClass": "horizon",
+                    "coverImage": "",
+                    "screenshots": [],
+                    "techStack": ["内容", "社媒"],
+                    "contributors": [
+                        {"name": "周涵", "role": "内容编辑", "avatar": ""},
+                        {"name": "林悦", "role": "视觉设计", "avatar": ""}
+                    ],
+                    "githubUrl": "",
+                    "demoUrl": "",
+                    "link": "/blog",
+                    "tags": ["内容", "社区"],
+                    "status": "active",
+                    "featured": False,
+                    "startDate": "2024-10"
+                }
             ],
             "cta": {
                 "title": "想要参与我们的项目？",
@@ -240,7 +374,7 @@ DEFAULT_PAGES = {
             },
             "form": {
                 "steps": ["基本信息", "选择方向", "完成提交"],
-                "defaultGithubUrl": DEFAULT_APPLICATION_GITHUB_URL,
+                "defaultGithubUrl": "",
                 "groups": [
                     {"id": "liuguang", "name": "流光组", "tag": "产品策划"},
                     {"id": "xinghui", "name": "星绘组", "tag": "视觉设计"},
