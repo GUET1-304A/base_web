@@ -6,8 +6,8 @@ from flask_jwt_extended import JWTManager
 from sqlalchemy import inspect, text
 
 from config import config
-from defaults import DEFAULT_GITHUB_URL
-from models import db, Page, Application
+from defaults import DEFAULT_GITHUB_URL, DEFAULT_SITE_CONFIG, DEFAULT_PAGES
+from models import db, Page, Application, SiteConfig, AdminUser
 
 
 def ensure_application_schema():
@@ -112,6 +112,24 @@ def ensure_join_page_defaults():
     db.session.commit()
 
 
+def _seed_defaults():
+    """首次启动时自动导入默认管理员、站点配置和页面数据"""
+    if not AdminUser.query.filter_by(username='admin').first():
+        admin = AdminUser(username='admin')
+        admin.set_password('admin123')
+        db.session.add(admin)
+
+    if not SiteConfig.query.first():
+        for key, value in DEFAULT_SITE_CONFIG.items():
+            db.session.add(SiteConfig(config_key=key, config_value=value))
+
+    if not Page.query.first():
+        for slug, page_data in DEFAULT_PAGES.items():
+            db.session.add(Page(slug=slug, title=page_data['title'], content=page_data['content']))
+
+    db.session.commit()
+
+
 def create_app(config_name=None):
     if config_name is None:
         config_name = os.environ.get('FLASK_ENV', 'development')
@@ -135,6 +153,7 @@ def create_app(config_name=None):
     with app.app_context():
         db.create_all()
         ensure_application_schema()
+        _seed_defaults()
         ensure_join_page_defaults()
     
     @app.errorhandler(404)
