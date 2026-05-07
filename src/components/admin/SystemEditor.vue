@@ -1,7 +1,18 @@
 <template>
   <div class="editor-section">
     <div class="editor-group">
-      <h3 class="group-title">系统设置</h3>
+      <h3 class="group-title">网站图标</h3>
+
+      <ImageUploadField
+        :model-value="modelValue.siteIcon || ''"
+        label="网站图标"
+        hint="上传后将显示在浏览器标签页和导航栏，建议使用正方形 PNG 或 SVG"
+        @update:model-value="val => update('siteIcon', val)"
+      />
+    </div>
+
+    <div class="editor-group">
+      <h3 class="group-title">飞书通知</h3>
 
       <div class="form-field">
         <label class="field-label">飞书通知方式</label>
@@ -61,6 +72,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import ImageUploadField from './ImageUploadField.vue'
 
 const props = defineProps({
   modelValue: {

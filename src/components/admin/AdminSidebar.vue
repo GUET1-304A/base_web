@@ -7,7 +7,8 @@
   >
     <div class="sidebar-header">
       <RouterLink to="/" class="sidebar-brand">
-        <span class="brand-mark">XY</span>
+        <img v-if="siteIcon" :src="siteIcon" alt="logo" class="sidebar-brand-icon" />
+        <span v-else class="brand-mark">XY</span>
         <span v-if="!collapsed" class="brand-text">管理后台</span>
       </RouterLink>
     </div>
@@ -94,6 +95,14 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import { api } from '../../services/api.js'
+
+const siteIcon = ref('')
+api.getSiteConfig().then((config) => {
+  if (config?.system?.siteIcon) siteIcon.value = config.system.siteIcon
+})
+
 defineProps({
   activeSection: {
     type: String,
@@ -194,6 +203,13 @@ function handleImport(e) {
   place-items: center;
   font-weight: 700;
   font-size: 14px;
+}
+
+.sidebar-brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .brand-text {

@@ -278,6 +278,7 @@ async function loadConfig() {
   try {
     siteConfig.value = await api.getAdminConfig()
     siteConfig.value.system = {
+      siteIcon: '',
       feishuMode: 'app',
       feishuWebhookUrl: '',
       feishuAppChatId: '',
