@@ -37,13 +37,30 @@
     <div class="form-section">
       <h3>项目列表</h3>
       <div class="projects-grid">
-        <div v-for="(project, index) in content.projects" :key="index" class="project-card">
+        <div
+          v-for="(project, index) in content.projects"
+          :key="index"
+          class="project-card"
+          :class="{ dragging: dragIndex === index, 'drag-over': dragOverIndex === index && dragIndex !== index }"
+          draggable="true"
+          @dragstart="onDragStart(index, $event)"
+          @dragover.prevent="onDragOver(index, $event)"
+          @dragenter.prevent="onDragEnter(index)"
+          @dragleave="onDragLeave(index)"
+          @drop="onDrop(index)"
+          @dragend="onDragEnd"
+        >
           <div class="card-header">
-            <span>{{ project.name || `项目 ${index + 1}` }}</span>
+            <div class="card-header-left">
+              <span class="drag-handle" title="拖拽排序">⠿</span>
+              <span>{{ project.name || `项目 ${index + 1}` }}</span>
+            </div>
             <div class="card-header-actions">
               <span v-if="project.status === 'wip'" class="status-badge wip">开发中</span>
               <span v-else-if="project.status === 'archived'" class="status-badge archived">已归档</span>
               <span v-if="project.featured" class="status-badge featured">精选</span>
+              <button class="sort-btn" :disabled="index === 0" @click="moveProject(index, -1)" title="上移">↑</button>
+              <button class="sort-btn" :disabled="index === content.projects.length - 1" @click="moveProject(index, 1)" title="下移">↓</button>
               <button class="remove-btn small" @click="removeProject(index)">×</button>
             </div>
           </div>
@@ -255,6 +272,8 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const newFilter = ref('')
+const dragIndex = ref(-1)
+const dragOverIndex = ref(-1)
 
 const defaultContent = {
   hero: { eyebrow: '', title: '', subtitle: '' },
@@ -329,6 +348,48 @@ function onNameChange(index, value) {
     content.projects[index].slug = slugify(value)
   }
   emitUpdate()
+}
+
+function moveProject(index, direction) {
+  const target = index + direction
+  if (target < 0 || target >= content.projects.length) return
+  const item = content.projects.splice(index, 1)[0]
+  content.projects.splice(target, 0, item)
+  emitUpdate()
+}
+
+function onDragStart(index, event) {
+  dragIndex.value = index
+  event.dataTransfer.effectAllowed = 'move'
+  event.dataTransfer.setData('text/plain', index)
+}
+
+function onDragOver(index, event) {
+  event.dataTransfer.dropEffect = 'move'
+}
+
+function onDragEnter(index) {
+  if (dragIndex.value !== index) {
+    dragOverIndex.value = index
+  }
+}
+
+function onDragLeave(index) {
+  if (dragOverIndex.value === index) {
+    dragOverIndex.value = -1
+  }
+}
+
+function onDrop(targetIndex) {
+  if (dragIndex.value === -1 || dragIndex.value === targetIndex) return
+  const item = content.projects.splice(dragIndex.value, 1)[0]
+  content.projects.splice(targetIndex, 0, item)
+  emitUpdate()
+}
+
+function onDragEnd() {
+  dragIndex.value = -1
+  dragOverIndex.value = -1
 }
 
 function addProject() {
@@ -547,10 +608,42 @@ function removeScreenshot(projectIndex, screenshotIndex) {
   align-items: center;
 }
 
-.card-header > span {
+.card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-header-left > span:last-child {
   font-size: 14px;
   font-weight: 600;
   color: var(--primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drag-handle {
+  cursor: grab;
+  font-size: 16px;
+  color: var(--muted);
+  user-select: none;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.project-card.dragging {
+  opacity: 0.4;
+}
+
+.project-card.drag-over {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(121, 168, 255, 0.3);
 }
 
 .card-header-actions {
@@ -724,6 +817,30 @@ function removeScreenshot(projectIndex, screenshotIndex) {
 .screenshot-upload-wrapper {
   flex: 1;
   min-width: 0;
+}
+
+.sort-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+
+.sort-btn:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.sort-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .remove-btn {
