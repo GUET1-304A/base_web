@@ -117,14 +117,14 @@ export function useGsapAnimations() {
 
         if (heading) {
           timeline.fromTo(heading,
-            { yPercent: 22, opacity: 0, rotateX: 22, rotateY: -12, filter: "blur(14px)", transformOrigin: "0% 0%" },
+            { yPercent: 22, opacity: 0, rotateX: 22, rotateY: -12, filter: "blur(10px)", transformOrigin: "0% 0%" },
             { yPercent: 0, opacity: 1, rotateX: 0, rotateY: 0, filter: "blur(0px)", ease: "none" }, 0
           )
         }
 
         if (toolbar) {
           timeline.fromTo(toolbar,
-            { yPercent: 16, opacity: 0, rotateX: 16, filter: "blur(10px)", transformOrigin: "50% 0" },
+            { yPercent: 16, opacity: 0, rotateX: 16, filter: "blur(8px)", transformOrigin: "50% 0" },
             { yPercent: 0, opacity: 1, rotateX: 0, filter: "blur(0px)", ease: "none" }, 0.06
           )
         }
