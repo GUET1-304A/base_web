@@ -160,11 +160,19 @@ def get_site_config():
         return jsonify({'error': 'No configuration found'}), 404
     
     result = {}
+    system_config = None
     for config in configs:
         if config.config_key == 'system':
+            system_config = config.config_value
             continue
         result[config.config_key] = config.config_value
-    
+
+    # 只公开 siteIcon，不暴露飞书密钥等敏感配置
+    if system_config and isinstance(system_config, dict):
+        site_icon = system_config.get('siteIcon', '')
+        if site_icon:
+            result['system'] = {'siteIcon': site_icon}
+
     return jsonify(result)
 
 

@@ -1,39 +1,15 @@
 services:
-  # Flask 后端
+  # Flask 后端（配置从 .env.docker 加载，environment 仅覆盖 Docker 特定项）
   backend:
     build: ./backend
     restart: unless-stopped
+    env_file: ./.env.docker
     environment:
       FLASK_ENV: production
-      SECRET_KEY: ${SECRET_KEY:-change-this-to-a-random-string}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-this-to-another-random-string}
+      APP_DEBUG: "false"
+      UPLOAD_FOLDER: /app/uploads
       DATABASE_URL: ${DATABASE_URL:-sqlite:////app/data/xingyu_cms.db}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
-      UPLOAD_FOLDER: /app/uploads
-      APP_DEBUG: "false"
-      ALIYUN_ACCESS_KEY_ID: ${ALIYUN_ACCESS_KEY_ID:-}
-      ALIYUN_ACCESS_KEY_SECRET: ${ALIYUN_ACCESS_KEY_SECRET:-}
-      ALIYUN_OSS_ENDPOINT: ${ALIYUN_OSS_ENDPOINT:-}
-      ALIYUN_OSS_BUCKET_NAME: ${ALIYUN_OSS_BUCKET_NAME:-}
-      ALIYUN_OSS_CDN_URL: ${ALIYUN_OSS_CDN_URL:-}
-      FEISHU_WEBHOOK_URL: ${FEISHU_WEBHOOK_URL:-}
-      FEISHU_APP_ENABLED: ${FEISHU_APP_ENABLED:-false}
-      FEISHU_APP_ID: ${FEISHU_APP_ID:-}
-      FEISHU_APP_SECRET: ${FEISHU_APP_SECRET:-}
-      FEISHU_APP_CHAT_ID: ${FEISHU_APP_CHAT_ID:-}
-      FEISHU_APP_VERIFICATION_TOKEN: ${FEISHU_APP_VERIFICATION_TOKEN:-}
-      FEISHU_APP_ENCRYPT_KEY: ${FEISHU_APP_ENCRYPT_KEY:-}
-      APPLICATION_ACTION_BASE_URL: ${APPLICATION_ACTION_BASE_URL:-}
-      MAIL_ENABLED: ${MAIL_ENABLED:-false}
-      SMTP_SERVER: ${SMTP_SERVER:-}
-      SMTP_PORT: ${SMTP_PORT:-465}
-      SMTP_USER: ${SMTP_USER:-}
-      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
-      SMTP_USE_TLS: "false"
-      SMTP_USE_SSL: "true"
-      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-星雨作坊}
-      SMTP_FROM: ${SMTP_FROM:-}
-      DEFAULT_GITHUB_URL: ${DEFAULT_GITHUB_URL:-https://github.com}
     volumes:
       - db_data:/app/data
       - uploads_data:/app/uploads

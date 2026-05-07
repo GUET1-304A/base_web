@@ -224,6 +224,7 @@ export const defaultSiteConfig = {
     slogan: '以协作连接灵感，以开源延续成长。'
   },
   system: {
+    siteIcon: '',
     feishuMode: 'app',
     feishuWebhookUrl: 'https://open.feishu.cn/open-apis/bot/v2/hook/56414ab3-8973-4f85-8b4f-74d5ddba546b',
     feishuAppChatId: ''

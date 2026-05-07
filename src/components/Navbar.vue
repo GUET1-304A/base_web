@@ -7,7 +7,8 @@
     }"
   >
     <RouterLink class="brand" :to="{ name: 'home', hash: '#home' }">
-      <span class="brand-mark">XY</span>
+      <img v-if="siteIcon" :src="siteIcon" alt="logo" class="brand-icon" />
+      <span v-else class="brand-mark">XY</span>
       <span class="brand-text">星雨作坊</span>
     </RouterLink>
     <nav class="nav">
@@ -23,8 +24,14 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { api } from '../services/api.js'
 
 const scrollY = ref(0)
+const siteIcon = ref('')
+
+api.getSiteConfig().then((config) => {
+  if (config?.system?.siteIcon) siteIcon.value = config.system.siteIcon
+})
 
 const topbarOpacity = computed(() => {
   const progress = Math.min(scrollY.value / 520, 1)
@@ -55,5 +62,12 @@ onBeforeUnmount(() => {
   opacity: var(--topbar-opacity, 1);
   background: rgba(8, 16, 30, var(--topbar-bg-opacity, 0.7));
   transition: opacity 0.18s linear, background 0.18s linear;
+}
+
+.brand-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 </style>
