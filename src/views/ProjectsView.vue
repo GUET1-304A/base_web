@@ -14,14 +14,17 @@
       <!-- Filter Section -->
       <section class="filter-section">
         <div class="filter-container">
-          <button 
-            v-for="filter in (pageData.filters || defaultFilters)" 
+          <button
+            v-for="filter in (pageData.filters || defaultFilters)"
             :key="filter"
             :class="['filter-btn', { active: activeFilter === filter }]"
             @click="activeFilter = filter"
           >
             {{ filter }}
           </button>
+          <router-link to="/projects/awards" class="filter-btn awards-link">
+            🏆 比赛奖项
+          </router-link>
         </div>
       </section>
 

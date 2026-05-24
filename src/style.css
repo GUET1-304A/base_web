@@ -10,7 +10,7 @@
   --primary: #79a8ff;
   --primary-strong: #95e4ff;
   --accent: #ad8cff;
-  --shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
   --radius: 24px;
   --hero-progress: 0;
 }
@@ -19,8 +19,30 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
+/* ===== 全局滚动条美化 ===== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(121, 168, 255, 0.2);
+  border-radius: 999px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(121, 168, 255, 0.4);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(121, 168, 255, 0.2) transparent;
 }
 
 body {
@@ -71,7 +93,6 @@ button {
 
 .starfield {
   opacity: 0.7;
-  will-change: transform, opacity;
   transform: translate3d(0,0,0);
   background-image:
     radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.95) 0 1px, transparent 1.8px),
@@ -116,14 +137,13 @@ button {
   width: 42vw;
   height: 42vw;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.28;
+  filter: blur(60px);
+  opacity: 0.22;
 }
 
 .ambient-glow-left {
   top: -12vw;
   left: -10vw;
-  will-change: transform, opacity;
   transform: translate3d(0,0,0);
   background: radial-gradient(circle, rgba(121, 168, 255, 0.6), transparent 62%);
   animation: driftGlow 18s ease-in-out infinite alternate;
@@ -132,7 +152,6 @@ button {
 .ambient-glow-right {
   right: -12vw;
   top: 10vh;
-  will-change: transform, opacity;
   transform: translate3d(0,0,0);
   background: radial-gradient(circle, rgba(173, 140, 255, 0.55), transparent 62%);
   animation: driftGlow 22s ease-in-out infinite alternate-reverse;
@@ -152,7 +171,7 @@ button {
   height: var(--size, 2px);
   border-radius: 999px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(149, 228, 255, 0.9));
-  box-shadow: 0 0 14px rgba(149, 228, 255, 0.9);
+  box-shadow: 0 0 8px rgba(149, 228, 255, 0.6);
   opacity: 0;
   will-change: transform, opacity;
   transform: translate3d(0,0,0) rotate(-28deg);
@@ -168,7 +187,6 @@ button {
   height: 2px;
   background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(149, 228, 255, 0.35), transparent 78%);
   transform: translate(100%, -50%);
-  filter: drop-shadow(0 0 8px rgba(149, 228, 255, 0.6));
 }
 
 .topbar {
@@ -183,9 +201,8 @@ button {
   padding: 16px 22px;
   border: 1px solid var(--panel-border);
   border-radius: 999px;
-  backdrop-filter: blur(16px);
-  background: rgba(8, 16, 30, 0.7);
-  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+  background: rgba(8, 16, 30, 0.75);
 }
 
 .brand {
@@ -237,7 +254,7 @@ button {
 .button-primary {
   background: linear-gradient(135deg, var(--primary), var(--primary-strong));
   color: #03111f;
-  box-shadow: 0 16px 40px rgba(121, 168, 255, 0.25);
+  box-shadow: 0 8px 20px rgba(121, 168, 255, 0.15);
 }
 
 .button-secondary {
@@ -275,25 +292,17 @@ button {
   z-index: 1;
 }
 
-.flip-section::before,
 .flip-section::after {
   content: "";
   position: absolute;
   pointer-events: none;
-}
 
-.flip-section::before {
-  content: none;
-}
-
-.flip-section::after {
   top: -2px;
   left: 50%;
   width: min(70vw, 920px);
   height: 1px;
   transform: translateX(-50%);
-  background: linear-gradient(90deg, transparent, rgba(149, 228, 255, 0.48), transparent);
-  box-shadow: 0 0 28px rgba(149, 228, 255, 0.25);
+  background: linear-gradient(90deg, transparent, rgba(149, 228, 255, 0.3), transparent);
 }
 
 .flip-section.is-dimmed {
@@ -326,8 +335,6 @@ button {
     rgba(121, 168, 255, 0.09) 88%
   );
   transform-origin: 50% 100%;
-  filter: blur(0);
-  will-change: transform, opacity;
 }
 
 .motion-fallback .flip-section.is-visible .flip-heading,
@@ -367,13 +374,12 @@ button {
   opacity: 0;
   transform-style: preserve-3d;
   backface-visibility: hidden;
-  will-change: transform, opacity, filter;
 }
 
 .flip-heading {
   transform-origin: 50% 0;
   transform: perspective(1600px) rotateX(20deg) translateY(56px);
-  filter: blur(10px);
+  filter: blur(4px);
   transition:
     transform 0.9s cubic-bezier(0.2, 0.7, 0, 1),
     opacity 0.75s ease,
@@ -383,7 +389,7 @@ button {
 .flip-toolbar {
   transform-origin: 50% 0;
   transform: perspective(1600px) rotateX(14deg) translateY(42px);
-  filter: blur(8px);
+  filter: blur(3px);
   transition:
     transform 0.9s cubic-bezier(0.2, 0.7, 0, 1) 0.12s,
     opacity 0.75s ease 0.12s,
@@ -399,7 +405,7 @@ button {
     rotateY(var(--tilt, 0deg))
     translateY(78px)
     scale(0.94);
-  filter: blur(12px);
+  filter: blur(5px);
   transition:
     transform 1s cubic-bezier(0.2, 0.72, 0, 1) var(--delay, 0s),
     opacity 0.8s ease var(--delay, 0s),
@@ -468,27 +474,19 @@ button {
   overflow: clip;
 }
 
-.hero::before,
 .hero::after {
   content: "";
   position: absolute;
   pointer-events: none;
-}
-
-.hero::before {
-  content: none;
-}
-
-.hero::after {
   left: 50%;
   bottom: -10vh;
   width: min(92vw, 1120px);
   height: 38vh;
   border-radius: 50%;
   background:
-    radial-gradient(circle, rgba(149, 228, 255, 0.2), rgba(121, 168, 255, 0.08) 32%, transparent 66%);
-  filter: blur(26px);
-  opacity: calc(0.28 + var(--hero-progress) * 0.5);
+    radial-gradient(circle, rgba(149, 228, 255, 0.15), rgba(121, 168, 255, 0.06) 32%, transparent 66%);
+  filter: blur(18px);
+  opacity: calc(0.22 + var(--hero-progress) * 0.4);
   transform:
     translateX(-50%)
     translateY(calc(var(--hero-progress) * 58px))
@@ -559,9 +557,8 @@ button {
 .open-banner {
   border: 1px solid var(--panel-border);
   border-radius: var(--radius);
-  background: var(--panel);
-  backdrop-filter: blur(18px);
-  box-shadow: var(--shadow);
+  background: rgba(12, 24, 42, 0.78);
+  backdrop-filter: blur(10px);
 }
 
 .hero-stats li {
@@ -601,7 +598,6 @@ button {
   content: "";
   position: absolute;
   inset: 0;
-  will-change: transform, opacity;
   transform: translate3d(0,0,0);
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95), transparent);
   animation: cueFlow 2s ease-in-out infinite;
@@ -625,7 +621,6 @@ button {
   position: absolute;
   border: 1px solid rgba(149, 228, 255, 0.18);
   border-radius: 50%;
-  will-change: transform, opacity;
   transform: translate3d(0,0,0);
   animation: rotateOrbit 22s linear infinite;
 }
@@ -658,7 +653,7 @@ button {
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-strong), var(--accent));
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 20px rgba(149, 228, 255, 0.8);
+  box-shadow: 0 0 12px rgba(149, 228, 255, 0.5);
   animation: pulse 3s ease-in-out infinite;
 }
 
@@ -667,14 +662,12 @@ button {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  will-change: transform, opacity;
   transform: translate3d(0,0,0);
   background:
     radial-gradient(circle, rgba(255, 255, 255, 0.94) 0, rgba(149, 228, 255, 0.85) 26%, rgba(121, 168, 255, 0.26) 54%, transparent 70%);
-  filter: blur(2px);
   box-shadow:
-    0 0 30px rgba(149, 228, 255, 0.5),
-    0 0 90px rgba(121, 168, 255, 0.3);
+    0 0 20px rgba(149, 228, 255, 0.3),
+    0 0 60px rgba(121, 168, 255, 0.15);
   animation: corePulse 5s ease-in-out infinite;
 }
 
@@ -685,12 +678,10 @@ button {
   padding: 28px;
   border: 1px solid rgba(149, 228, 255, 0.2);
   border-radius: 28px;
-  will-change: transform, opacity;
   transform: translate3d(0,0,0);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03)),
     rgba(10, 20, 36, 0.92);
-  box-shadow: var(--shadow);
   animation: floatCard 6s ease-in-out infinite;
 }
 
@@ -789,6 +780,7 @@ button {
   margin-top: 28px;
   padding: 24px;
   overflow: hidden;
+  transform-style: preserve-3d;
 }
 
 .product-stage-head {
@@ -845,10 +837,6 @@ button {
 
 .product-stage.is-page-turning .product-track {
   transition-duration: 0.35s;
-}
-
-.product-stage {
-  transform-style: preserve-3d;
 }
 
 .product-slide {
@@ -1193,9 +1181,7 @@ button {
 
   .hero-copy,
   .hero-visual,
-  .hero::before,
-  .hero::after,
-  .flip-section::before {
+  .hero::after {
     transform: none;
     opacity: 1;
     transition: none;

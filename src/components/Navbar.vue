@@ -1,11 +1,5 @@
 <template>
-  <header
-    class="topbar"
-    :style="{
-      '--topbar-opacity': topbarOpacity,
-      '--topbar-bg-opacity': topbarBackgroundOpacity
-    }"
-  >
+  <header class="topbar" ref="topbarEl">
     <RouterLink class="brand" :to="{ name: 'home', hash: '#home' }">
       <img v-if="siteIcon" :src="siteIcon" alt="logo" class="brand-icon" />
       <span v-else class="brand-mark">XY</span>
@@ -23,44 +17,42 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { api } from '../services/api.js'
 
-const scrollY = ref(0)
+const topbarEl = ref(null)
 const siteIcon = ref('')
 
 api.getSiteConfig().then((config) => {
   if (config?.system?.siteIcon) siteIcon.value = config.system.siteIcon
 })
 
-const topbarOpacity = computed(() => {
-  const progress = Math.min(scrollY.value / 520, 1)
-  return String(1 - progress * 0.28)
-})
+let ticking = false
 
-const topbarBackgroundOpacity = computed(() => {
-  const progress = Math.min(scrollY.value / 520, 1)
-  return String(0.7 - progress * 0.22)
-})
-
-function updateScrollY() {
-  scrollY.value = window.scrollY || 0
+function onScroll() {
+  if (ticking) return
+  ticking = true
+  requestAnimationFrame(() => {
+    if (!topbarEl.value) { ticking = false; return }
+    const progress = Math.min(window.scrollY / 520, 1)
+    topbarEl.value.style.opacity = String(1 - progress * 0.28)
+    topbarEl.value.style.background = `rgba(8, 16, 30, ${0.7 - progress * 0.22})`
+    ticking = false
+  })
 }
 
 onMounted(() => {
-  updateScrollY()
-  window.addEventListener('scroll', updateScrollY, { passive: true })
+  onScroll()
+  window.addEventListener('scroll', onScroll, { passive: true })
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', updateScrollY)
+  window.removeEventListener('scroll', onScroll)
 })
 </script>
 
 <style scoped>
 .topbar {
-  opacity: var(--topbar-opacity, 1);
-  background: rgba(8, 16, 30, var(--topbar-bg-opacity, 0.7));
   transition: opacity 0.18s linear, background 0.18s linear;
 }
 

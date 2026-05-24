@@ -37,6 +37,12 @@ const router = createRouter({
       meta: { title: '项目展示 - 星雨作坊' }
     },
     {
+      path: '/projects/awards',
+      name: 'awards',
+      component: () => import('../views/AwardsView.vue'),
+      meta: { title: '比赛奖项 - 星雨作坊' }
+    },
+    {
       path: '/project/:slug',
       name: 'project-detail',
       component: () => import('../views/ProjectDetailView.vue'),

@@ -9,7 +9,6 @@ services:
       APP_DEBUG: "false"
       UPLOAD_FOLDER: /app/uploads
       DATABASE_URL: ${DATABASE_URL:-sqlite:////app/data/xingyu_cms.db}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
     volumes:
       - db_data:/app/data
       - uploads_data:/app/uploads

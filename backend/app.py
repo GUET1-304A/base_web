@@ -112,6 +112,39 @@ def ensure_join_page_defaults():
     db.session.commit()
 
 
+def ensure_projects_awards_field():
+    projects_page = Page.query.filter_by(slug='projects').first()
+    if not projects_page or not isinstance(projects_page.content, dict):
+        return
+
+    content = dict(projects_page.content)
+    changed = False
+
+    if 'awards' not in content:
+        content['awards'] = {
+            'title': '比赛奖项',
+            'description': '社团成员在各类比赛中获得的荣誉与成果。',
+            'items': []
+        }
+        changed = True
+
+    awards = content.get('awards')
+    if awards and isinstance(awards, dict):
+        items = list(awards.get('items', []))
+        for i, item in enumerate(items):
+            if isinstance(item, dict) and 'description' not in item:
+                items[i] = dict(item)
+                items[i]['description'] = ''
+                changed = True
+        if changed:
+            content['awards'] = dict(awards)
+            content['awards']['items'] = items
+
+    if changed:
+        projects_page.content = content
+        db.session.commit()
+
+
 def _seed_defaults():
     """首次启动时自动导入默认管理员、站点配置和页面数据"""
     if not AdminUser.query.filter_by(username='admin').first():
@@ -155,6 +188,7 @@ def create_app(config_name=None):
         ensure_application_schema()
         _seed_defaults()
         ensure_join_page_defaults()
+        ensure_projects_awards_field()
     
     @app.errorhandler(404)
     def not_found(error):

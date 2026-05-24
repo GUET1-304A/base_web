@@ -152,6 +152,8 @@
                 :src="project.coverImage"
                 :alt="project.name"
                 class="featured-cover-image"
+                loading="lazy"
+                decoding="async"
               />
               <div class="featured-cover-overlay"></div>
               <span class="featured-badge">精选</span>
@@ -165,6 +167,48 @@
               </div>
             </div>
           </component>
+        </div>
+      </section>
+
+      <!-- Awards Section -->
+      <section v-if="awardItems.length" class="section flip-section" id="awards" data-reveal-section>
+        <div class="section-heading flip-heading">
+          <p class="eyebrow">AWARDS</p>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              flex-wrap: wrap;
+              gap: 1rem;
+              margin-bottom: 1rem;
+            "
+          >
+            <h2>{{ pageData.awards?.title || '比赛奖项' }}</h2>
+            <a class="button button-secondary" href="/projects/awards" style="padding: 8px 16px; font-size: 14px"
+              >查看全部</a
+            >
+          </div>
+          <p style="margin-top: 0">{{ pageData.awards?.description || '' }}</p>
+        </div>
+
+        <div class="awards-row">
+          <div
+            v-for="(award, index) in awardItems"
+            :key="index"
+            class="award-card flip-card"
+            :style="`--delay: ${0.06 + index * 0.08}s; --tilt: ${(index - 1) * 6}deg;`"
+            @click="openAwardDetail(award)"
+          >
+            <div class="award-image-wrap">
+              <img v-if="award.image" :src="award.image" :alt="award.title" loading="lazy" decoding="async" />
+              <div v-else class="award-image-placeholder">🏆</div>
+            </div>
+            <div class="award-body">
+              <h3>{{ award.title }}</h3>
+              <p v-if="award.description" class="award-home-desc">{{ award.description }}</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -225,6 +269,28 @@
       </section>
     </main>
 
+    <!-- Lightbox -->
+    <div v-if="lightboxSrc" class="home-lightbox" @click="closeLightbox">
+      <div class="home-lightbox-content">
+        <img :src="lightboxSrc" class="home-lightbox-image" />
+        <button class="home-lightbox-close" @click="closeLightbox">×</button>
+      </div>
+    </div>
+
+    <!-- Award Detail Modal -->
+    <div v-if="awardDetail" class="home-detail-modal" @click.self="closeAwardDetail">
+      <div class="home-detail-content">
+        <button class="home-detail-close" @click="closeAwardDetail">×</button>
+        <div v-if="awardDetail.image" class="home-detail-image-wrap">
+          <img :src="awardDetail.image" :alt="awardDetail.title" class="home-detail-image" />
+        </div>
+        <div class="home-detail-text">
+          <h2>{{ awardDetail.title }}</h2>
+          <MarkdownRenderer v-if="awardDetail.description" :text="awardDetail.description" class="home-detail-desc" />
+        </div>
+      </div>
+    </div>
+
     <Footer :config="siteConfig.footer" />
   </div>
 </template>
@@ -235,12 +301,26 @@ import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue'
+import MarkdownRenderer from '../components/MarkdownRenderer.vue'
 import { useGsapAnimations } from '../composables/useGsapAnimations.js'
+import { useScrollMotion } from '../composables/useScrollMotion.js'
 import { defaultSiteConfig } from '../data/defaultConfig.js'
 import { api } from '../services/api.js'
 
 const siteConfig = ref(defaultSiteConfig)
 const projectsData = ref([])
+const pageData = ref({})
+
+const awardItems = computed(() => pageData.value.awards?.items || [])
+const awardDetail = ref(null)
+
+function openAwardDetail(award) {
+  awardDetail.value = award
+}
+
+function closeAwardDetail() {
+  awardDetail.value = null
+}
 
 const featuredProjects = computed(() =>
   projectsData.value.filter(p => p.featured)
@@ -271,29 +351,205 @@ const openSourceCardStyle = (index) => {
 }
 
 useGsapAnimations()
+useScrollMotion()
 
 api.getSiteConfig().then((config) => {
   if (config) siteConfig.value = config
 })
 
 api.getPage('projects').then((data) => {
-  if (data?.projects) projectsData.value = data.projects
+  if (data) {
+    pageData.value = data
+    if (data.projects) projectsData.value = data.projects
+  }
   nextTick(() => {
-    gsap.registerPlugin(ScrollTrigger)
     const section = document.querySelector('#products')
     if (!section) return
     const cards = section.querySelectorAll('.featured-card')
     cards.forEach((card, index) => {
       gsap.fromTo(card,
-        { yPercent: 18, opacity: 0, rotateX: 26, filter: 'blur(12px)', transformOrigin: '50% 0' },
+        { yPercent: 18, opacity: 0, rotateX: 26, filter: 'blur(5px)', transformOrigin: '50% 0' },
         { yPercent: 0, opacity: 1, rotateX: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out', delay: 0.15 + index * 0.1 }
       )
     })
+    const awardSection = document.querySelector('#awards')
+    if (awardSection) {
+      const awardCards = awardSection.querySelectorAll('.award-card')
+      awardCards.forEach((card, index) => {
+        gsap.fromTo(card,
+          { yPercent: 18, opacity: 0, rotateX: 26, filter: 'blur(5px)', transformOrigin: '50% 0' },
+          { yPercent: 0, opacity: 1, rotateX: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out', delay: 0.15 + index * 0.1 }
+        )
+      })
+    }
   })
 })
 </script>
 
 <style scoped>
+/* ===== 奖项展示 ===== */
+.awards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.award-card {
+  background: rgba(11, 26, 46, 0.6);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.35s ease;
+}
+
+.award-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+}
+
+.award-image-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+  display: grid;
+  place-items: center;
+}
+
+.award-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.3s;
+}
+
+.award-card:hover .award-image-wrap img {
+  transform: scale(1.04);
+}
+
+.award-image-placeholder {
+  font-size: 56px;
+  opacity: 0.3;
+}
+
+.award-body {
+  padding: 16px 20px;
+}
+
+.award-body h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 6px;
+  line-height: 1.5;
+}
+
+.award-home-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.award-card {
+  cursor: pointer;
+}
+
+/* Detail Modal */
+.home-detail-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+  padding: 24px;
+}
+
+.home-detail-content {
+  position: relative;
+  max-width: 720px;
+  width: 100%;
+  max-height: 85vh;
+  background: rgba(12, 24, 42, 0.96);
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  overflow-y: auto;
+}
+
+.home-detail-close {
+  position: sticky;
+  top: 12px;
+  float: right;
+  margin: 12px 16px 0 0;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  line-height: 1;
+}
+
+.home-detail-close:hover {
+  opacity: 1;
+}
+
+.home-detail-image-wrap {
+  width: 100%;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.home-detail-image {
+  max-width: 100%;
+  max-height: 55vh;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.home-detail-text {
+  padding: 8px 28px 32px;
+}
+
+.home-detail-text h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 14px;
+}
+
+.home-detail-desc {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.8;
+  margin: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* ===== 精选项目横排 ===== */
 .featured-row {
   display: grid;

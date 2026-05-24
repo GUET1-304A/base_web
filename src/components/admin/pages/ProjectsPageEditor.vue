@@ -222,6 +222,49 @@
       <button class="add-btn" @click="addProject">+ 添加项目</button>
     </div>
 
+    <!-- 奖项管理 -->
+    <div class="form-section">
+      <h3>比赛奖项</h3>
+      <div class="form-group">
+        <label>区块标题</label>
+        <input v-model="content.awards.title" type="text" @input="emitUpdate" />
+      </div>
+      <div class="form-group">
+        <label>区块描述</label>
+        <textarea v-model="content.awards.description" rows="2" @input="emitUpdate"></textarea>
+      </div>
+      <div class="awards-list">
+        <div v-for="(award, index) in content.awards.items" :key="index" class="award-item">
+          <div class="award-header">
+            <span class="award-label">奖项 {{ index + 1 }}</span>
+            <button class="remove-btn small" @click="removeAward(index)">×</button>
+          </div>
+          <div class="award-body">
+            <input
+              v-model="award.title"
+              placeholder="奖项名称（如：2024 计算机设计大赛省级一等奖）"
+              @input="emitUpdate"
+            />
+            <textarea
+              v-model="award.description"
+              placeholder="奖项详细介绍 — 可描述参赛作品、获奖级别、项目背景等"
+              rows="3"
+              @input="emitUpdate"
+            ></textarea>
+            <div class="award-image-field">
+              <ImageUploadField
+                :model-value="award.image"
+                label="奖状图片"
+                hint="上传或填写奖状图片 URL"
+                @update:model-value="updateAwardImage(index, $event)"
+              />
+            </div>
+          </div>
+        </div>
+        <button class="add-btn" @click="addAward">+ 添加奖项</button>
+      </div>
+    </div>
+
     <!-- CTA 区域 -->
     <div class="form-section">
       <h3>CTA 区域</h3>
@@ -279,6 +322,7 @@ const defaultContent = {
   hero: { eyebrow: '', title: '', subtitle: '' },
   filters: ['全部', '精选'],
   projects: [],
+  awards: { title: '比赛奖项', description: '', items: [] },
   cta: {
     title: '',
     description: '',
@@ -417,6 +461,22 @@ function addProject() {
 
 function removeProject(index) {
   content.projects.splice(index, 1)
+  emitUpdate()
+}
+
+function addAward() {
+  if (!content.awards) content.awards = { title: '比赛奖项', description: '', items: [] }
+  content.awards.items.push({ title: '', description: '', image: '' })
+  emitUpdate()
+}
+
+function removeAward(index) {
+  content.awards.items.splice(index, 1)
+  emitUpdate()
+}
+
+function updateAwardImage(index, value) {
+  content.awards.items[index].image = value
   emitUpdate()
 }
 
@@ -700,6 +760,77 @@ function removeScreenshot(projectIndex, screenshotIndex) {
 .sub-field label {
   font-size: 12px;
   color: var(--muted);
+}
+
+/* Awards */
+.awards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.award-item {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.award-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(121, 168, 255, 0.05);
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.award-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.award-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.award-body input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.award-body input:focus,
+.award-body textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.award-body textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  font-size: 13px;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 60px;
+  line-height: 1.5;
+}
+
+.award-image-field {
+  max-width: 300px;
 }
 
 .add-btn {
