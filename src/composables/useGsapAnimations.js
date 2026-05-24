@@ -90,7 +90,7 @@ export function useGsapAnimations() {
           pageEdge.setAttribute("aria-hidden", "true")
           section.insertBefore(pageEdge, section.firstChild)
         }
-        
+
         const pageEdge = section.querySelector(".page-flip-edge")
 
         ScrollTrigger.create({
@@ -110,21 +110,21 @@ export function useGsapAnimations() {
           },
         })
 
-        timeline.fromTo(pageEdge, 
+        timeline.fromTo(pageEdge,
           { rotateX: 105, opacity: 0, scaleY: 0.2, transformOrigin: "50% 100%" },
           { rotateX: 48, opacity: 0.5, scaleY: 1, ease: "none" }, 0
         )
 
         if (heading) {
           timeline.fromTo(heading,
-            { yPercent: 22, opacity: 0, rotateX: 22, rotateY: -12, filter: "blur(10px)", transformOrigin: "0% 0%" },
+            { yPercent: 22, opacity: 0, rotateX: 22, rotateY: -12, filter: "blur(4px)", transformOrigin: "0% 0%" },
             { yPercent: 0, opacity: 1, rotateX: 0, rotateY: 0, filter: "blur(0px)", ease: "none" }, 0
           )
         }
 
         if (toolbar) {
           timeline.fromTo(toolbar,
-            { yPercent: 16, opacity: 0, rotateX: 16, filter: "blur(8px)", transformOrigin: "50% 0" },
+            { yPercent: 16, opacity: 0, rotateX: 16, filter: "blur(3px)", transformOrigin: "50% 0" },
             { yPercent: 0, opacity: 1, rotateX: 0, filter: "blur(0px)", ease: "none" }, 0.06
           )
         }
@@ -134,7 +134,7 @@ export function useGsapAnimations() {
           const rotateYFrom = tiltMatch ? parseFloat(tiltMatch) : 0
 
           timeline.fromTo(card,
-            { yPercent: 18, opacity: 0, rotateX: 26, rotateY: rotateYFrom * 0.65, filter: "blur(12px)", transformOrigin: "50% 0" },
+            { yPercent: 18, opacity: 0, rotateX: 26, rotateY: rotateYFrom * 0.65, filter: "blur(5px)", transformOrigin: "50% 0" },
             { yPercent: 0, opacity: 1, rotateX: 0, rotateY: 0, filter: "blur(0px)", ease: "none" }, 0.12 + index * 0.07
           )
         })

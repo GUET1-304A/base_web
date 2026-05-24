@@ -113,6 +113,9 @@ async function request(url, options = {}) {
   }
 }
 
+let siteConfigCache = null;
+let siteConfigPromise = null;
+
 export const api = {
   async getSiteConfig() {
     try {
@@ -121,7 +124,22 @@ export const api = {
         const preview = readPreviewValue(SITE_PREVIEW_KEY);
         if (preview) return normalizeLegacyData(preview);
       }
-      return normalizeLegacyData(await request('/config'));
+      if (siteConfigCache) return siteConfigCache;
+      if (siteConfigPromise) return siteConfigPromise;
+      siteConfigPromise = request('/config')
+        .then(data => {
+          siteConfigCache = normalizeLegacyData(data);
+          return siteConfigCache;
+        })
+        .catch(error => {
+          console.warn('Failed to fetch config from server, using default:', error);
+          siteConfigCache = normalizeLegacyData(defaultSiteConfig);
+          return siteConfigCache;
+        })
+        .finally(() => {
+          siteConfigPromise = null;
+        });
+      return siteConfigPromise;
     } catch (error) {
       console.warn('Failed to fetch config from server, using default:', error);
       return normalizeLegacyData(defaultSiteConfig);

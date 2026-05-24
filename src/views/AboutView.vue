@@ -61,8 +61,8 @@
             <p>{{ pageData.groups?.subtitle || '环绕同一颗创意太阳运转的专业智慧节点。' }}</p>
           </div>
           <div class="groups-grid">
-            <div 
-              v-for="(group, index) in (pageData.groups?.items || defaultGroups)" 
+            <div
+              v-for="(group, index) in (pageData.groups?.items || defaultGroups)"
               :key="index"
               :class="['group-card', `group-${index}`]"
             >
@@ -79,26 +79,6 @@
       </section>
 
       <!-- Timeline Section -->
-      <section class="timeline-section">
-        <div class="timeline-container">
-          <div class="timeline-header">
-            <span class="timeline-eyebrow">{{ pageData.timeline?.eyebrow || '演进' }}</span>
-            <h2 v-html="formatTitle(pageData.timeline?.title || '我们的星际航行')"></h2>
-          </div>
-          <div class="timeline-content">
-            <div 
-              v-for="(item, index) in (pageData.timeline?.items || defaultTimeline)" 
-              :key="index"
-              class="timeline-item"
-            >
-              <div :class="['timeline-dot', `dot-${index}`]"></div>
-              <span :class="['timeline-year', `year-${index}`]">{{ item.year }}</span>
-              <h3>{{ item.title }}</h3>
-              <p>{{ item.description }}</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <!-- CTA Section -->
       <section class="cta-section">
@@ -134,6 +114,7 @@ import { ref, onMounted } from 'vue'
 import { api } from '../services/api.js'
 import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue'
+import MarkdownRenderer from '../components/MarkdownRenderer.vue'
 
 const pageData = ref({})
 

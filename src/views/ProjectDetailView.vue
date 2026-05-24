@@ -105,7 +105,7 @@
           <div class="section-container">
             <h2 class="section-title">项目介绍</h2>
             <div class="long-description">
-              <p v-for="(para, index) in descriptionParagraphs" :key="index">{{ para }}</p>
+              <MarkdownRenderer :text="project.longDescription" />
             </div>
           </div>
         </section>
@@ -202,6 +202,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { api } from '../services/api.js'
 import Navbar from '../components/Navbar.vue'
 import Footer from '../components/Footer.vue'
+import MarkdownRenderer from '../components/MarkdownRenderer.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -211,11 +212,6 @@ const loading = ref(true)
 
 const project = computed(() => {
   return allProjects.value.find(p => p.slug === route.params.slug) || null
-})
-
-const descriptionParagraphs = computed(() => {
-  if (!project.value?.longDescription) return []
-  return project.value.longDescription.split('\n').filter(p => p.trim())
 })
 
 const relatedProjects = computed(() => {
@@ -491,15 +487,10 @@ watch(() => route.params.slug, () => {
 }
 
 /* Long Description */
-.long-description p {
+.long-description {
   color: var(--muted);
   font-size: 16px;
   line-height: 1.8;
-  margin-bottom: 16px;
-}
-
-.long-description p:last-child {
-  margin-bottom: 0;
 }
 
 /* Contributors */
